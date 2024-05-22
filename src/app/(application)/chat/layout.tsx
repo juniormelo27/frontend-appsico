@@ -107,14 +107,14 @@ export default async function LayoutRoot({
               {item.users
                 .filter((e) => e.id !== session.user.id)
                 .map((item) => (
-                  <Avatar key={item.id}>
+                  <Avatar key={item.id} className='rounded'>
                     <AvatarImage src={item.image || PLACEHOLDER.src} />
                     <AvatarFallback>{item.name[0]}</AvatarFallback>
                   </Avatar>
                 ))}
             </div>
             <div className='w-full relative truncate py-4'>
-              <span className='text-xs text-[0.5rem] text-gray-500 font-light absolute top-2 right-0'>
+              <span className='text-xs text-[0.4rem] text-gray-500 font-light absolute top-2 right-0'>
                 {new Intl.DateTimeFormat('pt-BR', {
                   dateStyle: 'short',
                 }).format(item.created_at)}{' '}
