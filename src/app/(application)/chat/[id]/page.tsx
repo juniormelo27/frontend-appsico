@@ -15,7 +15,6 @@ import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
 import { baseURL, normalizeUrl } from '@/services/fetch';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
 import { Loader2Icon, LucideSendHorizontal } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
@@ -59,7 +58,6 @@ export default function ChatScreen() {
 
   const [timeNextPage, setTimeNextPage] = useState<boolean>(false);
 
-  const queryClient = useQueryClient();
   const messages = useConversationMessages(params.id, {
     limit: 100,
   });
