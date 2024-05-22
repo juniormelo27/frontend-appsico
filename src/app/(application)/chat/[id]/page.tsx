@@ -35,8 +35,8 @@ const SchemaMessage = z.object({
 type TypeMessage = z.infer<typeof SchemaMessage>;
 
 const urlWs =
-  process.env.NODE_ENV === 'production'
-    ? 'wss://appsico.segwise.com.br/chat/'
+  process.env.NODE_ENV !== 'production'
+    ? 'ws://appsico.segwise.com.br/chat/'
     : 'ws://localhost:3001/chat/';
 console.log(urlWs);
 
