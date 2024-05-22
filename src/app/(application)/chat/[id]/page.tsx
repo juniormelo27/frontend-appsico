@@ -13,7 +13,6 @@ import {
 import { cn } from '@/libraries/utils';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
-import { baseURL, normalizeUrl } from '@/services/fetch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2Icon, LucideSendHorizontal } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -36,12 +35,9 @@ const SchemaMessage = z.object({
 type TypeMessage = z.infer<typeof SchemaMessage>;
 
 const urlWs =
-  (process.env.NODE_ENV !== 'production' ? 'ws://' : 'wss://') +
-  normalizeUrl(
-    `${baseURL.replace('https://', '').replace('https://', '')}/chat/`
-  )
-    .replace('http://', '')
-    .replace('https://', '');
+  process.env.NODE_ENV === 'production'
+    ? 'wss://appsico-backend-40-production.up.railway.app/chat/'
+    : 'ws://localhost:3001/chat/';
 console.log(urlWs);
 
 export default function ChatScreen() {
