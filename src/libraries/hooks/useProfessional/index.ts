@@ -77,6 +77,13 @@ export const useProfessionals = (
         }
       }
 
+      if (props.address?.state) {
+        searchParams.set('state', props.address.state);
+      }
+      if (props.address?.city) {
+        searchParams.set('city', props.address.city);
+      }
+
       const response = await http<ResponseFindManyProfessionals>(
         '/professionals/?' + searchParams.toString(),
         {

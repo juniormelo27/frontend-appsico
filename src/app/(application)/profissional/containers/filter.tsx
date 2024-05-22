@@ -399,6 +399,8 @@ export default function Filter() {
                                         ? undefined
                                         : current
                                     );
+                                    
+                                    form.setValue('address.city', '')
 
                                     setOpenState(false);
                                   }}

@@ -40,7 +40,9 @@ const http = async <T>(
       throw new Error(error?.message || response.statusText);
     }
 
-    return (await response.json()) as T;
+    const data = (await response.json()) as T;
+
+    return data as T;
   });
 
 export default http;

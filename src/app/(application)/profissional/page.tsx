@@ -27,10 +27,19 @@ const LIMIT = 24;
 export default function ProfessionalScreen(props: {
   searchParams: RequestFindManyProfessionals & {
     viewed?: 'grid' | 'list';
+    state?: string;
+    city?: string;
   };
 }) {
   const { data, isPending, error, refetch } = useProfessionals({
     ...props.searchParams,
+    address:
+      props.searchParams.state || props.searchParams.city
+        ? {
+            state: props.searchParams.state,
+            city: props.searchParams.city,
+          }
+        : undefined,
     limit: LIMIT,
     validated: true,
   });
