@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const queryClient = new QueryClient();
 
-const baseURL = 'http://localhost:3001/';
+const baseURL = process.env.DATABASE_URL as string;
 
 function normalizeUrl(url: string) {
   const protocolIndex = url.indexOf('://');
