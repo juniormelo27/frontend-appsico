@@ -38,7 +38,6 @@ const urlWs =
   process.env.NODE_ENV === 'production'
     ? 'wss://appsico-backend-40-production.up.railway.app/chat/'
     : 'ws://localhost:3001/chat/';
-console.log(urlWs);
 
 export default function ChatScreen() {
   const params = useParams<{
@@ -243,7 +242,7 @@ function Message({
 }) {
   if (!session) return;
 
-  if (data.sender.id === session) {
+  if (data.sender.id !== session) {
     return (
       <div className='flex justify-end mb-4'>
         <div className='flex flex-col items-end justify-end'>
@@ -282,15 +281,22 @@ function Message({
         width={52}
         height={52}
       />
-      <div className='ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white'>
-        {data.content}
+      <div className='items-start justify-start'>
+        <div className='ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white'>
+          {data.content}
+        </div>
+        <span className='block text-right text-xs mt-1 pl-2'>
+          {new Intl.DateTimeFormat('pt-BR', {
+            dateStyle: 'short',
+          }).format(data.created_at)}{' '}
+          ás{' '}
+          {new Intl.DateTimeFormat('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          }).format(data.created_at)}
+        </span>
       </div>
-      <span>
-        fdsfdsf
-        {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(
-          data.created_at
-        )}
-      </span>
     </div>
   );
 }

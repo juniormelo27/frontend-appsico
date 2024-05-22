@@ -37,6 +37,7 @@ const http = async <T>(
   ).then(async (response) => {
     if (!response.ok) {
       const error = await response.json();
+
       throw new Error(error?.message || response.statusText);
     }
 

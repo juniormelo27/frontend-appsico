@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import authOptions from '@/services/auth';
+import http from '@/services/fetch';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -45,6 +46,40 @@ export default async function LayoutRoot({
     return redirect('/');
   }
 
+  const slots = await http<{
+    data: Array<string>;
+  }>(`/conversations/slots/${session.user.id}`, {
+    method: 'GET',
+  });
+
+  const conversations = await Promise.all(
+    slots.data.map((item) =>
+      http<{
+        id: string;
+        users: Array<{
+          id: string;
+          name: string;
+          image?: string;
+        }>;
+        messages: {
+          id: string;
+          type: 'text' | 'image' | 'video';
+          content: string;
+          created_at: Date;
+        };
+        created_at: Date;
+      }>(`/conversations/slots/${session.user.id}/${item}`, {
+        method: 'GET',
+        next: {
+          tags: ['conversation', item, 'slot'],
+        },
+      }).then((response) => ({
+        ...response,
+        created_at: new Date(response.created_at),
+      }))
+    )
+  );
+
   return (
     <div className='grid grid-cols-[25vw_auto] bg-white flex-1'>
       <div className='flex flex-col overflow-y-auto sticky self-start top-20 left-0'>
@@ -82,12 +117,12 @@ export default async function LayoutRoot({
               <span className='text-xs text-[0.5rem] text-gray-500 font-light absolute top-2 right-0'>
                 {new Intl.DateTimeFormat('pt-BR', {
                   dateStyle: 'short',
-                }).format(item.updatedAt)}{' '}
+                }).format(item.created_at)}{' '}
                 ás{' '}
                 {new Intl.DateTimeFormat('pt-BR', {
                   hour: '2-digit',
                   minute: '2-digit',
-                }).format(item.updatedAt)}
+                }).format(item.created_at)}
               </span>
               <div className='text-lg font-semibold'>
                 {item.users
@@ -96,7 +131,7 @@ export default async function LayoutRoot({
                   .join(', ')}
               </div>
               <span className='text-gray-500 truncate text-sm'>
-                {item.message}
+                {item.messages.content}
               </span>
             </div>
           </Link>
