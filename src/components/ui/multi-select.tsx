@@ -48,7 +48,7 @@ interface MultiSelectProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
   asChild?: boolean;
-  options: {
+  options?: {
     label: string;
     value: string;
     icon?: React.ComponentType<{ className?: string }>;
@@ -67,7 +67,7 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
       className,
       variant,
       asChild = false,
-      options,
+      options = [],
       defaultValue,
       onValueChange,
       disabled,
@@ -134,7 +134,7 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
                         className={cn(
                           isAnimating ? 'animate-bounce' : '',
                           multiSelectVariants({ variant, className }),
-                          'text-xs font-normal rounded-sm !shadow-none drop-shadow-none'
+                          'text-xs font-normal rounded-sm !shadow-none drop-shadow-none capitalize'
                         )}
                         style={{
                           animationDuration: `${animation}s`,
@@ -195,7 +195,7 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
             <CommandList>
               <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
               <CommandGroup>
-                {options.map((option) => {
+                {options?.map((option) => {
                   const isSelected = selectedValuesSet.current.has(
                     option.value
                   );
@@ -213,7 +213,7 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
                       {option.icon && (
                         <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
                       )}
-                      <span>{option.label}</span>
+                      <span className='capitalize'>{option.label}</span>
                     </CommandItem>
                   );
                 })}

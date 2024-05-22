@@ -38,7 +38,9 @@ export const useAuthRegister = () =>
   >({
     mutationKey: ['auth', 'register'],
     mutationFn: async (value) => {
-      const response = await http('/auth/register', {
+      const response = await http<{
+        message: string;
+      }>('/auth/register', {
         method: 'POST',
         body: JSON.stringify({
           ...value,
@@ -46,14 +48,7 @@ export const useAuthRegister = () =>
         }),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message, {
-          cause: data.description,
-        });
-      }
-
-      return data;
+      return response;
     },
   });
 
@@ -67,18 +62,13 @@ export const useAuthForgot = () =>
   >({
     mutationKey: ['auth', 'forgot-password'],
     mutationFn: async (value) => {
-      const response = await http('/auth/forgot-password', {
+      const response = await http<{
+        message: string;
+      }>('/auth/forgot-password', {
         method: 'POST',
         body: JSON.stringify(value),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message, {
-          cause: data.description,
-        });
-      }
-
-      return data;
+      return response;
     },
   });

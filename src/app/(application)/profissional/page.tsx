@@ -13,7 +13,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useProfessional } from '@/libraries/hooks/useProfessional';
+import {
+  RequestFindManyProfessionals,
+  useProfessionals,
+} from '@/libraries/hooks/useProfessional';
 import masked from '@/libraries/masked';
 import { cn } from '@/libraries/utils';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
@@ -22,15 +25,12 @@ import Pagination, { TabGrid } from './containers/pagination';
 const LIMIT = 24;
 
 export default function ProfessionalScreen(props: {
-  searchParams: {
-    cursor?: string;
-    search?: string;
+  searchParams: RequestFindManyProfessionals & {
     viewed?: 'grid' | 'list';
   };
 }) {
-  const { data, isPending, error } = useProfessional({
-    cursor: props.searchParams.cursor,
-    search: props.searchParams.search,
+  const { data, isPending, error, refetch } = useProfessionals({
+    ...props.searchParams,
     limit: LIMIT,
     validated: true,
   });
@@ -72,7 +72,7 @@ export default function ProfessionalScreen(props: {
                 <CardContent className='p-0'>
                   <Button
                     type='button'
-                    onClick={() => window.location.reload()}
+                    onClick={() => refetch()}
                     className='mt-2'
                   >
                     Recarregar página

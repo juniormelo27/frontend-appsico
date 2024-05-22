@@ -27,11 +27,9 @@ import { useAuthLogin } from '@/libraries/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LucideUser2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 export default function FormLogin() {
-  const router = useRouter();
   const { toast, dismiss } = useToast();
 
   const form = useForm<Login>({

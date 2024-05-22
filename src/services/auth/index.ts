@@ -1,5 +1,5 @@
 import SchemaLogin from '@/@types/schema/auth/login';
-import { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import environment from '../env';
 import http from '../fetch';
@@ -22,7 +22,7 @@ const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const { email, password } = SchemaLogin.parse(credentials);
 
-        const response = await http('/auth/login', {
+        const response = await http<User>('/auth/login', {
           method: 'POST',
           body: JSON.stringify({
             email,
@@ -30,20 +30,13 @@ const authOptions: NextAuthOptions = {
           }),
         });
 
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message, {
-            cause: data.description,
-          });
-        }
-
         return {
-          id: data.id,
-          sub: data.id,
-          name: data.name,
-          email: data.email,
-          image: data.image,
-          role: data.role,
+          id: response.id,
+          sub: response.id,
+          name: response.name,
+          email: response.email,
+          image: response.image,
+          role: response.role,
         };
       },
     }),

@@ -1,12 +1,47 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/libraries/utils';
 import authOptions from '@/services/auth';
+import http from '@/services/fetch';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
 
+type ResponseAnalytics = {
+  count: number;
+};
+
 export default async function Hero() {
   const session = await getServerSession(authOptions);
+
+  const [patients, professionals, conversations] = await Promise.all([
+    await http<ResponseAnalytics>('/analytics/count/patients', {
+      next: {
+        revalidate: 3600,
+        tags: ['fgdsfsdfdsfds'],
+      },
+    }),
+    await http<ResponseAnalytics>('/analytics/count/professionals', {
+      next: {
+        revalidate: 3600,
+      },
+    }),
+    await http<ResponseAnalytics>('/analytics/count/conversations', {
+      next: {
+        revalidate: 3600,
+      },
+    }),
+  ]);
+
+  const analytics = {
+    count: {
+      patients: patients.count,
+      professionals: professionals.count,
+      conversations: conversations.count,
+    },
+    sum: {
+      users: patients.count + professionals.count,
+    },
+  };
 
   return (
     <section className='px-24 max-md:px-5 grid grid-cols-[auto_40vw] max-md:grid-cols-1 gap-40 max-md:gap-4 items-center justify-center self-center mt-24 max-md:mt-0 mb-6'>
@@ -33,15 +68,15 @@ export default async function Hero() {
           <div className='flex flex-row items-center justify-start gap-10 mt-14'>
             {[
               {
-                title: '30+',
+                title: `${analytics.count.patients}+`,
                 description: 'Usuários',
               },
               {
-                title: '30+',
+                title: `${analytics.count.professionals}+`,
                 description: 'Profissionais',
               },
               {
-                title: '30+',
+                title: `${analytics.count.conversations}+`,
                 description: 'Conexões',
               },
             ].map((item, index) => (

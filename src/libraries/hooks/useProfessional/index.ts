@@ -1,42 +1,50 @@
 import http from '@/services/fetch';
 import { useQuery } from '@tanstack/react-query';
 
-export const useProfessional = (
-  props: {
-    cursor?: string;
-    limit: number;
-    search?: string;
-    validated?: boolean;
-    specialties?: Array<string>;
-    approach?: Array<string>;
-    service?: Array<string>;
-  } = {
+export type RequestFindManyProfessionals = {
+  cursor?: string;
+  limit: number;
+  search?: string;
+  validated?: boolean;
+  specialties?: Array<string>;
+  approach?: Array<string>;
+  service?: Array<string>;
+  address?: {
+    state?: string;
+    city?: string;
+  };
+};
+
+type ResponseFindManyProfessionals = {
+  next?: string;
+  previous?: string;
+  data: Array<{
+    id: string;
+    type: 'patient' | 'professional';
+    name: string;
+    image: string;
+    profile?: {
+      bio: string;
+      approach: Array<{
+        id: string;
+        name: string;
+      }>;
+      specialties: Array<{
+        id: string;
+        name: string;
+      }>;
+      service: Array<string>;
+    };
+  }>;
+  total: number;
+};
+
+export const useProfessionals = (
+  props: RequestFindManyProfessionals = {
     limit: 30,
   }
 ) =>
-  useQuery<{
-    next?: string;
-    previous?: string;
-    data: Array<{
-      id: string;
-      type: 'patient' | 'professional';
-      name: string;
-      image: string;
-      profile?: {
-        bio: string;
-        approach: Array<{
-          id: string;
-          name: string;
-        }>;
-        specialties: Array<{
-          id: string;
-          name: string;
-        }>;
-        service: Array<string>;
-      };
-    }>;
-    total: number;
-  }>({
+  useQuery<ResponseFindManyProfessionals>({
     queryKey: ['professional', props],
     queryFn: async ({ signal }) => {
       const searchParams = new URLSearchParams();
@@ -47,7 +55,7 @@ export const useProfessional = (
       if (props.limit) {
         searchParams.set('limit', props.limit.toString());
       }
-      if (props.search) {
+      if (!!props.search?.length) {
         searchParams.set('search', props.search);
       }
       if (props.validated) {
@@ -69,7 +77,7 @@ export const useProfessional = (
         }
       }
 
-      const response = await http(
+      const response = await http<ResponseFindManyProfessionals>(
         '/professionals/?' + searchParams.toString(),
         {
           signal,
@@ -77,13 +85,98 @@ export const useProfessional = (
         }
       );
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message, {
-          cause: data.description,
-        });
-      }
-
-      return data;
+      return response;
     },
+  });
+
+export const useProfessionalsSpecialties = () =>
+  useQuery<
+    Array<{
+      id: string;
+      name: string;
+    }>
+  >({
+    queryKey: ['professionals', 'specialties'],
+    queryFn: async ({ signal }) => {
+      const response = await http<
+        Array<{
+          id: string;
+          name: string;
+        }>
+      >('/professionals/specialties', {
+        signal,
+        method: 'GET',
+      });
+
+      return response;
+    },
+  });
+
+export const useProfessionalsApproach = () =>
+  useQuery<
+    Array<{
+      id: string;
+      name: string;
+    }>
+  >({
+    queryKey: ['professionals', 'approach'],
+    queryFn: async ({ signal }) => {
+      const response = await http<
+        Array<{
+          id: string;
+          name: string;
+        }>
+      >('/professionals/approach', {
+        signal,
+        method: 'GET',
+      });
+
+      return response;
+    },
+  });
+
+export const useProfessionalsServices = () =>
+  useQuery<Array<string>>({
+    queryKey: ['professionals', 'services'],
+    queryFn: async ({ signal }) => {
+      const response = await http<Array<string>>('/professionals/services', {
+        signal,
+        method: 'GET',
+      });
+
+      return response;
+    },
+  });
+
+export const useProfessionalsStates = () =>
+  useQuery<Array<string>>({
+    queryKey: ['professionals', 'address', 'states'],
+    queryFn: async ({ signal }) => {
+      const response = await http<Array<string>>('/professionals/states', {
+        signal,
+        method: 'GET',
+      });
+
+      return response;
+    },
+  });
+
+export const useProfessionalsCities = (state?: string) =>
+  useQuery<Array<string>>({
+    queryKey: ['professionals', 'address', state, 'cities'],
+    queryFn: async ({ signal }) => {
+      const response = await http<Array<string>>(
+        `/professionals/states/${state}`,
+        {
+          signal,
+          method: 'GET',
+          next: {
+            revalidate: 3600,
+          },
+        }
+      );
+
+      return response;
+    },
+    enabled: !!state ? true : false,
   });

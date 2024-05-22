@@ -31,15 +31,15 @@ export default function CookiesAccepts({
               d='M15.5174 56.1528C16.2903 57.6825 16.929 61.4559 14.8118 60.9459C13.5013 60.5381 11.4445 57.6213 12.493 56.1528C12.661 55.8468 13.2189 55.2757 14.106 55.4389'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M15.5173 49.6263L14.0262 48.5579C13.5346 48.2056 12.8477 48.3707 12.658 48.945C12.3456 49.8907 12.1258 51.1463 12.462 52.2324C12.5336 52.4636 12.7127 52.6466 12.9449 52.7146C13.8342 52.9751 15.2568 52.9048 15.8197 51.054'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <mask
               id='path-3-inside-1_4542_101166'
@@ -93,36 +93,36 @@ export default function CookiesAccepts({
               d='M31.6479 50.2383C31.5807 51.2241 32.1721 53.053 35.0756 52.4819'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M50.9903 34.6769C50.1699 34.1428 48.3973 33.5907 47.8709 35.6552'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M40.9087 17.4562C40.0882 16.9221 38.3156 16.37 37.7892 18.4345'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M27.8502 29.3345C27.1279 29.998 26.1419 31.587 27.977 32.6357'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M62.1917 19.585C62.4894 18.6451 62.5577 16.7703 60.4502 16.7902'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <ellipse
               cx='51.2061'
@@ -146,8 +146,8 @@ export default function CookiesAccepts({
               d='M5.85665 41.8048C5.21042 40.2694 2.74791 41.1651 1.59743 41.8048C0.642774 42.2505 0.863078 43.8717 2.03804 45.2004C2.978 46.2634 4.14317 45.7909 4.60826 45.4219C5.29365 44.8559 6.50288 43.3402 5.85665 41.8048Z'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M45.4596 49.2172C40.9431 47.667 40.2844 51.6987 40.5196 53.9083C40.8221 55.3361 42.4351 55.54 43.4433 55.2341C45.5677 54.5894 51.1052 51.1548 45.4596 49.2172Z'
@@ -180,22 +180,22 @@ export default function CookiesAccepts({
               d='M56.9526 54.9284C57.7592 53.5006 60.2795 51.0735 65.1187 49.9313C66.0596 49.7953 67.9818 48.5647 68.1431 44.7302C68.3448 39.9371 73.5872 32.9003 69.3529 28.1072C67.5382 26.053 68.4456 23.2121 67.5382 17.7051'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M66.7316 16.176C65.1521 14.2383 60.6625 9.8939 55.3394 8.01743C48.703 5.67797 55.8063 4.55591 44.1399 4.75246C44.0816 4.75344 44.0194 4.76029 43.9617 4.76836C43.019 4.90008 40.5102 4.51266 37.2614 1.95295C37.2161 1.91728 37.1681 1.88406 37.1153 1.86091C36.6 1.63502 35.1744 1.43154 32.9584 2.2045C30.6195 3.02036 24.0531 5.46791 21.0622 6.58971C20.4237 6.92965 19.0056 8.05825 18.441 9.85312C17.7353 12.0967 5.93991 23.5187 9.56927 28.9237'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
             <path
               d='M10.4768 30.1484C11.9084 30.3333 14.621 31.3895 15.0562 34.1372C15.1369 34.6464 15.5068 35.0847 16.0079 35.2063C18.8253 35.8904 22.6446 38.4014 20.8122 44.4603C20.7218 44.7592 20.7652 45.0847 20.9158 45.3583C21.7327 46.8422 22.367 49.4462 20.6725 51.7386C20.1262 52.4776 20.4167 53.842 21.2912 54.1243C23.3727 54.7962 25.8398 55.985 27.2662 57.833C27.5533 58.2049 28.0338 58.3932 28.4956 58.3062C30.4142 57.9446 33.9492 57.9776 37.2937 60.233C42.1328 63.4964 42.3345 60.0291 48.6858 60.7429C53.7669 61.314 55.7765 58.3294 56.1462 56.7656'
               stroke='currentColor'
               className=''
-              stroke-width='2'
-              stroke-linecap='round'
+              strokeWidth='2'
+              strokeLinecap='round'
             />
           </svg>
           <div className='grow'>

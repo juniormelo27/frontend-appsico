@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const queryClient = new QueryClient();
 
 const baseURL = 'http://localhost:3001/';
+
 function normalizeUrl(url: string) {
   const protocolIndex = url.indexOf('://');
 
@@ -19,9 +20,27 @@ function normalizeUrl(url: string) {
   return protocolPart + normalizedPathPart;
 }
 
-const http = (input: RequestInfo | URL, init?: RequestInit) =>
-  fetch(z.string().url() ? normalizeUrl(baseURL + input) : input, {
-    ...init,
+const http = async <T>(
+  input: RequestInfo | URL,
+  init?: RequestInit
+): Promise<T> =>
+  fetch(
+    !z
+      .string()
+      .url()
+      .safeParse(input as string).success
+      ? normalizeUrl(baseURL + input)
+      : input,
+    {
+      ...init,
+    }
+  ).then(async (response) => {
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error?.message || response.statusText);
+    }
+
+    return (await response.json()) as T;
   });
 
 export default http;

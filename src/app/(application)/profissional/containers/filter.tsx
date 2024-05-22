@@ -24,25 +24,28 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverValue,
 } from '@/components/ui/popover';
+import {
+  useProfessionalsApproach,
+  useProfessionalsCities,
+  useProfessionalsServices,
+  useProfessionalsSpecialties,
+  useProfessionalsStates,
+} from '@/libraries/hooks/useProfessional';
 import masked from '@/libraries/masked';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  LucideCheck,
-  LucideChevronsUpDown,
-  LucideFilter,
-  Trash,
-} from 'lucide-react';
+import { LucideCheck, LucideFilter, Trash } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const Schema = z.object({
-  search: z.string().min(3, 'Mínimo 3 caracteres').optional(),
+  search: z.string().min(3, 'Mínimo 3 caracteres').or(z.literal('')).optional(),
   specialties: z.array(z.string().ulid()).optional(),
   approach: z.array(z.string().ulid()).optional(),
-  service: z.array(z.string().ulid()).optional(),
+  services: z.array(z.string()).optional(),
   address: z
     .object({
       state: z.string().optional(),
@@ -53,43 +56,10 @@ const Schema = z.object({
 
 type Type = z.infer<typeof Schema>;
 
-const specialties = [
-  {
-    id: 'fsdfsdfd',
-    name: 'fdsfdsfd sfds f dsf',
-  },
-  {
-    id: 'sdfdsf',
-    name: 'sfdfds',
-  },
-];
-
-const services = [
-  {
-    id: 'fsdfsdfd',
-    name: 'fdsfdsfd sfds f dsf',
-  },
-  {
-    id: 'sdfdsf',
-    name: 'sfdfds',
-  },
-];
-
 const states = [
   {
     id: 'fdsfdsfdsf',
     name: 'fdsfdsfdsfdsfdsfs',
-  },
-];
-
-const approach = [
-  {
-    id: 'fsdfsdfd',
-    name: 'fdsfdsfd sfds f dsf',
-  },
-  {
-    id: 'sdfdsf',
-    name: 'sfdfds',
   },
 ];
 
@@ -114,44 +84,106 @@ export default function Filter() {
     reValidateMode: 'onChange',
     resolver: zodResolver(Schema),
     defaultValues: {
-      search: undefined,
+      search: '',
       specialties: undefined,
       approach: undefined,
-      service: undefined,
+      services: undefined,
       address: undefined,
     },
   });
+  const values = form.watch();
+
+  const specialties = useProfessionalsSpecialties();
+  const approach = useProfessionalsApproach();
+  const services = useProfessionalsServices();
+
+  const states = useProfessionalsStates();
+  const cities = useProfessionalsCities(values.address?.state);
 
   const errorForm = useMemo(() => {
     let error = false;
 
-    if (!Schema.safeParse(form.watch()).success) {
+    if (!Schema.safeParse(values).success) {
       error = true;
     }
 
     const formEmpty =
-      !form.watch('search') &&
-      !form.watch('specialties') &&
-      !form.watch('approach') &&
-      !form.watch('service') &&
-      (!form.watch('address') ||
-        (!form.watch('address.state') && !form.watch('address.city')));
+      !values.search?.length &&
+      !values.specialties?.length &&
+      !values.approach?.length &&
+      !values.services?.length &&
+      (!values.address ||
+        (values.address && !values.address.state && !values.address.city));
 
     if (formEmpty) {
       error = true;
     }
 
+    if (formEmpty && !!params.size) {
+      error = false;
+    }
+
     return error;
-  }, [form.watch()]);
+  }, [values, params]);
 
   function mutate() {
     const search = form.getValues('search');
+    const specialties = form.getValues('specialties');
+    const approach = form.getValues('approach');
+    const services = form.getValues('services');
+    const state = form.getValues('address.state');
+    const city = form.getValues('address.city');
 
     const searchParams = new URLSearchParams(params);
 
-    if (search) {
-      searchParams.delete('cursor');
+    searchParams.delete('cursor');
+
+    if (!!search?.length) {
       searchParams.set('search', search);
+    } else {
+      searchParams.delete('search');
+    }
+
+    if (!!specialties?.length) {
+      searchParams.delete('specialties');
+
+      for (const item of specialties) {
+        searchParams.append('specialties', item);
+      }
+    } else {
+      searchParams.delete('specialties');
+    }
+
+    if (!!approach?.length) {
+      searchParams.delete('approach');
+
+      for (const item of approach) {
+        searchParams.append('approach', item);
+      }
+    } else {
+      searchParams.delete('approach');
+    }
+
+    if (!!services?.length) {
+      searchParams.delete('services');
+
+      for (const item of services) {
+        searchParams.append('services', item);
+      }
+    } else {
+      searchParams.delete('services');
+    }
+
+    if (!!state) {
+      searchParams.set('state', state);
+    } else {
+      searchParams.delete('state');
+    }
+
+    if (!!city) {
+      searchParams.set('city', city);
+    } else {
+      searchParams.delete('city');
     }
 
     const url = `${pathname}?${searchParams.toString()}`;
@@ -160,19 +192,68 @@ export default function Filter() {
   }
 
   function clear() {
-    return (window.location.href = pathname);
+    return router.push(pathname);
   }
+
+  useEffect(() => {
+    const search = params.get('search');
+
+    const specialties = params.getAll('specialties');
+    const approach = params.getAll('approach');
+    const services = params.getAll('services');
+
+    const state = params.get('state');
+    const city = params.get('city');
+
+    if (!!search) {
+      form.setValue('search', search);
+    } else {
+      form.setValue('search', '');
+    }
+
+    if (!!specialties.length) {
+      form.setValue('specialties', specialties);
+    } else {
+      form.setValue('specialties', []);
+    }
+    if (!!approach.length) {
+      form.setValue('approach', approach);
+    } else {
+      form.setValue('approach', []);
+    }
+    if (!!services.length) {
+      form.setValue('services', services);
+    } else {
+      form.setValue('services', []);
+    }
+
+    if (!!state) {
+      form.setValue('address.state', state);
+    } else {
+      form.setValue('address.state', '');
+    }
+    if (!!city) {
+      form.setValue('address.city', city);
+    } else {
+      form.setValue('address.city', '');
+    }
+  }, [form, params]);
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(() => mutate())}
-        className='bg-white dark:bg-gray-950 overflow-hidden p-6 space-y-8 sticky max-md:relative top-20 max-md:top-0 left-0 self-start'
+        className='bg-white dark:bg-gray-950 p-6 space-y-8 max-md:relative'
       >
         <div className='flex flex-row items-center justify-between gap-4'>
           <h1 className='text-2xl font-bold -mb-6'>Filtros:</h1>
           {!!params.size && (
-            <Button size='icon' type='button' onClick={clear} className='w-6 h-6'>
+            <Button
+              size='icon'
+              type='button'
+              onClick={clear}
+              className='w-6 h-6'
+            >
               <Trash className='w-3 h-3' />
             </Button>
           )}
@@ -204,9 +285,10 @@ export default function Filter() {
               <FormControl>
                 <MultiSelect
                   {...field}
+                  defaultValue={field.value}
                   placeholder='Especialidades'
                   onValueChange={(value) => field.onChange(value)}
-                  options={specialties.map((item) => ({
+                  options={specialties.data?.map((item) => ({
                     value: item.id,
                     label: item.name,
                   }))}
@@ -217,40 +299,42 @@ export default function Filter() {
         />
         <FormField
           control={form.control}
-          name='service'
+          name='services'
           render={() => (
             <FormItem>
               <FormLabel className='mb-1'>Tipo de atendimento:</FormLabel>
-              {services.map((item) => (
+              {services.data?.map((item) => (
                 <FormField
-                  key={item.id}
+                  key={item}
                   control={form.control}
-                  name='service'
+                  name='services'
                   render={({ field }) => {
                     return (
                       <FormItem
-                        key={item.id}
+                        key={item}
                         className='flex flex-row items-start space-x-3 space-y-0'
                       >
                         <FormControl>
                           <Checkbox
-                            checked={field.value?.includes(item.id)}
+                            checked={field.value?.includes(item)}
                             onCheckedChange={(checked) => {
                               return checked
                                 ? field.onChange([
                                     ...(field?.value || []),
-                                    item.id,
+                                    item,
                                   ])
                                 : field.onChange(
                                     field.value?.filter(
-                                      (value) => value !== item.id
+                                      (value) => value !== item
                                     )
                                   );
                             }}
                           />
                         </FormControl>
-                        <FormLabel className='font-normal'>
-                          {item.name}
+                        <FormLabel className='font-normal capitalize cursor-pointer'>
+                          {item === 'social' && 'Social'}
+                          {item === 'covenant' && 'Convênio'}
+                          {item === 'private' && 'Particular'}
                         </FormLabel>
                       </FormItem>
                     );
@@ -269,9 +353,10 @@ export default function Filter() {
               <FormControl>
                 <MultiSelect
                   {...field}
+                  defaultValue={field.value}
                   placeholder='Abordagem'
                   onValueChange={(value) => field.onChange(value)}
-                  options={approach.map((item) => ({
+                  options={approach.data?.map((item) => ({
                     value: item.id,
                     label: item.name,
                   }))}
@@ -294,13 +379,7 @@ export default function Filter() {
                   <FormControl>
                     <Popover open={openState} onOpenChange={setOpenState}>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant='outline'
-                          className='w-full justify-between font-normal text-gray-500 pl-3'
-                        >
-                          Pesquisar Estado...
-                          <LucideChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                        </Button>
+                        <PopoverValue placeholder='Pesquisar Estado' />
                       </PopoverTrigger>
                       <PopoverContent align='start' className='w-[300px] p-0'>
                         <Command>
@@ -310,10 +389,10 @@ export default function Filter() {
                               Nenhum Estado encontrado.
                             </CommandEmpty>
                             <CommandGroup>
-                              {states?.map((item) => (
+                              {states.data?.map((item) => (
                                 <CommandItem
-                                  key={item.id}
-                                  value={item.id}
+                                  key={item}
+                                  value={item}
                                   onSelect={(current) => {
                                     field.onChange(
                                       current === field.value
@@ -323,11 +402,12 @@ export default function Filter() {
 
                                     setOpenState(false);
                                   }}
+                                  className='capitalize'
                                 >
-                                  {field.value === item.id && (
+                                  {field.value === item && (
                                     <LucideCheck className='mr-2 h-4 w-4' />
                                   )}
-                                  {item.name}
+                                  {item}
                                 </CommandItem>
                               ))}
                             </CommandGroup>
@@ -339,7 +419,7 @@ export default function Filter() {
                 </FormItem>
               )}
             />
-            {form.watch('address.state') && (
+            {values.address?.state && (
               <FormField
                 control={form.control}
                 name='address.city'
@@ -349,13 +429,7 @@ export default function Filter() {
                     <FormControl>
                       <Popover open={openCity} onOpenChange={setOpenCity}>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant='outline'
-                            className='w-full justify-between font-normal text-gray-500 pl-3'
-                          >
-                            Pesquisar cidade...
-                            <LucideChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                          </Button>
+                          <PopoverValue placeholder='Pesquisar cidade' />
                         </PopoverTrigger>
                         <PopoverContent align='start' className='w-[300px] p-0'>
                           <Command>
@@ -365,10 +439,10 @@ export default function Filter() {
                                 Nenhuma cidade encontrado.
                               </CommandEmpty>
                               <CommandGroup>
-                                {cities?.map((item) => (
+                                {cities.data?.map((item) => (
                                   <CommandItem
-                                    key={item.id}
-                                    value={item.id}
+                                    key={item}
+                                    value={item}
                                     onSelect={(current) => {
                                       field.onChange(
                                         current === field.value
@@ -376,13 +450,14 @@ export default function Filter() {
                                           : current
                                       );
 
-                                      setOpenState(false);
+                                      setOpenCity(false);
                                     }}
+                                    className='capitalize'
                                   >
-                                    {field.value === item.id && (
+                                    {field.value === item && (
                                       <LucideCheck className='mr-2 h-4 w-4' />
                                     )}
-                                    {item.name}
+                                    {item}
                                   </CommandItem>
                                 ))}
                               </CommandGroup>

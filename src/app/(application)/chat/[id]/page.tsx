@@ -5,14 +5,13 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LucideSendHorizontal } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,17 +41,20 @@ const SchemaReceiver = z.object({
 });
 type TypeReceiver = z.infer<typeof SchemaReceiver>;
 
-const socket = new WebSocket('ws://localhost:3001/chats');
-
 export default function ChatScreen() {
   const params = useParams<{
     id: string;
   }>();
 
+  const socket = useMemo(
+    () => new WebSocket('ws://localhost:3001/chat/' + params.id),
+    [params.id]
+  );
+
   const session = useSession().data?.user.id;
   const [messages, setMessage] = useState<TypeReceiver[]>([]);
 
-  const { toast } = useToast();
+  const [connect, setConnect] = useState<boolean | null>(null);
 
   const form = useForm<TypeMessage>({
     mode: 'all',
@@ -78,34 +80,43 @@ export default function ChatScreen() {
     form.reset();
   }
 
-  useEffect(() => {
-    socket.addEventListener('message', (event) => {
-      const data = JSON.parse(event.data) as TypeReceiver;
-      setMessage((e) => [
-        {
-          id: data.id,
-          type: data.type,
-          sender: {
-            id: data.sender.id,
-            image: data.sender.image,
-            name: data.sender.name,
-          },
-          message: data.message,
-          created: data.created_at,
+  function connectUser() {
+    setConnect(true);
+  }
+
+  function disconnectUser() {
+    setConnect(true);
+  }
+
+  function receiverMessage(event: any) {
+    const data = JSON.parse(event.data) as TypeReceiver;
+    setMessage((e) => [
+      ...e,
+      {
+        id: data.id,
+        type: data.type,
+        sender: {
+          id: data.sender.id,
+          image: data.sender.image,
+          name: data.sender.name,
         },
-        ...e,
-      ]);
-    });
+        message: data.message,
+        created_at: data.created_at,
+      },
+    ]);
+  }
 
-    socket.addEventListener('error', () => {
-      toast({
-        title: 'Falha na conexão'.toUpperCase(),
-        variant: 'destructive',
-      });
-    });
+  useEffect(() => {
+    socket.addEventListener('open', connectUser);
 
-    return () => {};
-  }, []);
+    socket.addEventListener('error', disconnectUser);
+
+    socket.addEventListener('message', receiverMessage);
+
+    return () => {
+      socket.close();
+    };
+  }, [socket]);
 
   return (
     <div className='w-full h-full flex flex-col justify-between relative overflow-hidden'>
@@ -144,7 +155,7 @@ export default function ChatScreen() {
   );
 }
 
-function Message({ data, session }: { data: Type; session?: string }) {
+function Message({ data, session }: { data: TypeReceiver; session?: string }) {
   if (!session) return;
 
   if (data.sender.id === session) {

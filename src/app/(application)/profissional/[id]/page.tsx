@@ -1,10 +1,14 @@
-import { Button } from '@/components/ui/button';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
-import { LucideMessageSquare } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import ButtonChat from './button-chat';
 
-export default function ProfessionalDetailsScreen() {
+export default function ProfessionalDetailsScreen({
+  params: { id },
+}: {
+  params: {
+    id: string;
+  };
+}) {
   return (
     <main>
       <section className='relative '>
@@ -54,14 +58,7 @@ export default function ProfessionalDetailsScreen() {
                   <i className='fas fa-map-marker-alt mr-2 text-lg text-blueGray-400'></i>
                   Los Angeles, California
                 </div>
-                <Link href='/chat'>
-                  <Button
-                    className='uppercase w-60 text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150'
-                    type='button'
-                  >
-                    Conversar <LucideMessageSquare className='w-4 h-4 ml-3' />
-                  </Button>
-                </Link>
+                <ButtonChat id={id} />
                 <div className='mb-2 text-blueGray-600 mt-10'>
                   <i className='fas fa-briefcase mr-2 text-lg text-blueGray-400'></i>
                   Solution Manager - Creative Tim Officer
