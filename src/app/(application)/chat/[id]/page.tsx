@@ -168,6 +168,10 @@ export default function ChatScreen() {
               messages.fetchNextPage();
             }
           }}
+          overscan={{
+            main: 10,
+            reverse: 10,
+          }}
           initialTopMostItemIndex={messagesList.length - 1}
           totalCount={messagesList.length}
           className='flex flex-col z-10 justify-end items-end w-full h-full mb-20'

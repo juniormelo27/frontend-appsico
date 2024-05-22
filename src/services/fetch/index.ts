@@ -3,7 +3,9 @@ import { z } from 'zod';
 
 export const queryClient = new QueryClient();
 
-const baseURL = process.env.DATABASE_URL as string;
+const baseURL = process.env.NEXT_PUBLIC_DATABASE_URL as string;
+
+console.log(baseURL);
 
 function normalizeUrl(url: string) {
   const protocolIndex = url.indexOf('://');
