@@ -37,7 +37,7 @@ const SchemaMessage = z.object({
 type TypeMessage = z.infer<typeof SchemaMessage>;
 
 const urlWs =
-  'ws://' +
+  (process.env.NODE_ENV !== 'production' ? 'ws://' : 'wss://') +
   normalizeUrl(
     `${baseURL.replace('https://', '').replace('https://', '')}/chat/`
   )
