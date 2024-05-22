@@ -13,6 +13,7 @@ import {
 import { cn } from '@/libraries/utils';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
+import { baseURL, normalizeUrl } from '@/services/fetch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2Icon, LucideSendHorizontal } from 'lucide-react';
@@ -35,24 +36,32 @@ const SchemaMessage = z.object({
 });
 type TypeMessage = z.infer<typeof SchemaMessage>;
 
+const urlWs =
+  'ws://' +
+  normalizeUrl(
+    `${baseURL.replace('https://', '').replace('https://', '')}/chat/`
+  )
+    .replace('http://', '')
+    .replace('https://', '');
+console.log(urlWs);
+
 export default function ChatScreen() {
   const params = useParams<{
     id: string;
   }>();
 
-  const socket = useMemo(
-    () => new WebSocket('ws://localhost:3001/chat/' + params.id),
-    [params.id]
-  );
+  const socket = useMemo(() => new WebSocket(urlWs + params.id), [params.id]);
 
   const session = useSession().data?.user.id;
   const chat = useRef<any>(null);
 
   const [connect, setConnect] = useState<boolean | null>(null);
 
+  const [timeNextPage, setTimeNextPage] = useState<boolean>(false);
+
   const queryClient = useQueryClient();
   const messages = useConversationMessages(params.id, {
-    limit: 30,
+    limit: 100,
   });
   const [messagesList, setMessageList] = useState<
     Array<
@@ -85,8 +94,10 @@ export default function ChatScreen() {
       })
     );
 
+    chat.current.scrollToIndex(messagesList.length);
+
     form.reset();
-  }, [socket, params.id, session, form]);
+  }, [socket, params.id, session, form, messagesList.length]);
 
   function connectUser() {
     setConnect(true);
@@ -96,34 +107,21 @@ export default function ChatScreen() {
     setConnect(false);
   }
 
-  const receiverMessage = useCallback(
-    (event: any) => {
-      const data = JSON.parse(event.data) as TypeMessageSend & {
-        message: string;
-        created_at: string;
-      };
+  const receiverMessage = useCallback((event: any) => {
+    const data = JSON.parse(event.data) as TypeMessageSend & {
+      message: string;
+      created_at: string;
+    };
 
-      const queyrClientReturn: any = queryClient.getQueryData([
-        'conversations',
-        params.id,
-        'messages',
-      ]);
-
-      setMessageList((e) => [
-        ...e,
-        {
-          ...data,
-          content: data.message,
-          created_at: new Date(data.created_at),
-        },
-      ]);
-
-      chat.current.scrollToIndex(
-        queyrClientReturn?.pages.flatMap((item: any) => item.data).flat().length
-      );
-    },
-    [queryClient, params.id, chat]
-  );
+    setMessageList((e) => [
+      ...e,
+      {
+        ...data,
+        content: data.message,
+        created_at: new Date(data.created_at),
+      },
+    ]);
+  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -137,6 +135,12 @@ export default function ChatScreen() {
     //@ts-ignore
     setMessageList((e) => [...messages.data, ...e]);
   }, [messages.data]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setTimeNextPage(true);
+    }, 500);
+  }, []);
 
   return (
     <div className='w-full h-full flex flex-col justify-between relative overflow-hidden'>
@@ -155,7 +159,7 @@ export default function ChatScreen() {
       {connect === false && (
         <Badge className='bg-red-400 uppercase border-b rounded-none z-10 text-center items-center justify-center'>
           <span className='flex flex-row items-center justify-center gap-2'>
-            desconectado <Loader2Icon className='w-3 h-3 animate-spin' />
+            desconectado
           </span>
         </Badge>
       )}
@@ -165,12 +169,10 @@ export default function ChatScreen() {
           atTopThreshold={500}
           atTopStateChange={(value) => {
             if (value && messages.hasNextPage) {
-              messages.fetchNextPage();
+              if (timeNextPage) {
+                messages.fetchNextPage();
+              }
             }
-          }}
-          overscan={{
-            main: 10,
-            reverse: 10,
           }}
           initialTopMostItemIndex={messagesList.length - 1}
           totalCount={messagesList.length}
