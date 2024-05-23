@@ -11,30 +11,6 @@ import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-const conversations: Array<{
-  id: string;
-  users: Array<{
-    id: string;
-    name: string;
-    image?: string | null;
-  }>;
-  message: string;
-  updatedAt: Date;
-}> = [
-  {
-    id: 'fdsfdsfdsfdsf',
-    users: [
-      {
-        id: 'fdsfdsfds',
-        name: 'fdsfdsf',
-      },
-    ],
-    message:
-      'fsdfdsfdsfdsfds fsdfds fdsf dsf dsf ds ffsd fds fsd fsd fsd fs df sdf ',
-    updatedAt: new Date(),
-  },
-];
-
 export default async function LayoutRoot({
   children,
 }: Readonly<{

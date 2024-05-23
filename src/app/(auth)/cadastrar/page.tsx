@@ -85,8 +85,6 @@ export default function FormRegister(props: {
     });
   }
 
-  console.log(form.watch());
-
   return (
     <Card className='w-full border-0 shadow-none overflow-scroll max-md:overflow-hidden h-full py-0'>
       <CardHeader>
