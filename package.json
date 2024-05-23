@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "git": "git add . && git commit -m 'updated' && git push"
+    "git-push": "git add . && git commit -m 'updated' && git push"
   },
   "prettier": {
     "singleQuote": true,
