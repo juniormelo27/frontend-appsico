@@ -50,6 +50,7 @@ export default async function LayoutRoot({
     data: Array<string>;
   }>(`/conversations/slots/${session.user.id}`, {
     method: 'GET',
+    cache: 'no-cache',
   });
 
   const conversations = await Promise.all(
@@ -73,12 +74,15 @@ export default async function LayoutRoot({
         next: {
           tags: ['conversation', item, 'slot'],
         },
+        cache: 'no-cache',
       }).then((response) => ({
         ...response,
         created_at: new Date(response.created_at),
       }))
     )
   );
+
+  console.log(conversations);
 
   return (
     <div className='grid grid-cols-[25vw_auto] bg-white flex-1'>
