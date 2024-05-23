@@ -14,12 +14,7 @@ import { redirect } from 'next/navigation';
 
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
 
-export default async function ChatScreen({
-  children,
-  ...prop
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function ChatScreen() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
