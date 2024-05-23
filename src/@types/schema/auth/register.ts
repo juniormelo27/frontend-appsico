@@ -5,7 +5,7 @@ import { SchemaEmail, SchemaPassword } from './utils';
 
 const SchemaRegister = z
   .object({
-    type: z.enum(['client', 'professional']),
+    type: z.enum(['patient', 'professional']),
     name: SchemaName,
     email: SchemaEmail,
     password: SchemaPassword,
@@ -19,7 +19,7 @@ const SchemaRegister = z
   })
   .refine(
     (value) =>
-      value.type === 'client'
+      value.type === 'patient'
         ? true
         : value.type === 'professional' && value.registration,
     {
