@@ -76,46 +76,52 @@ export default async function LayoutRoot({
             className='w-full rounded-l-none'
           />
         </div>
-        {conversations.map((item) => (
-          <Link
-            key={item.id}
-            className='flex flex-row px-2 items-center border-b-2 truncate'
-            href={`/chat/${item.id}`}
-            replace
-          >
-            <div className='mr-3'>
-              {item.users
-                .filter((e) => e.id !== session.user.id)
-                .map((item) => (
-                  <Avatar key={item.id} className='rounded'>
-                    <AvatarImage src={item.image || PLACEHOLDER.src} />
-                    <AvatarFallback>{item.name[0]}</AvatarFallback>
-                  </Avatar>
-                ))}
-            </div>
-            <div className='w-full relative truncate py-4'>
-              <span className='text-xs text-[0.4rem] text-gray-500 font-light absolute top-2 right-0'>
-                {new Intl.DateTimeFormat('pt-BR', {
-                  dateStyle: 'short',
-                }).format(item.created_at)}{' '}
-                ás{' '}
-                {new Intl.DateTimeFormat('pt-BR', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                }).format(item.created_at)}
-              </span>
-              <div className='text-lg font-semibold'>
+        {conversations
+          .sort(
+            (a, b) =>
+              //@ts-ignore
+              new Date(b.messages.created_at) - new Date(a.messages.created_at)
+          )
+          .map((item) => (
+            <Link
+              key={item.id}
+              className='flex flex-row px-2 items-center border-b-2 truncate'
+              href={`/chat/${item.id}`}
+              replace
+            >
+              <div className='mr-3'>
                 {item.users
                   .filter((e) => e.id !== session.user.id)
-                  .flatMap((item) => item.name)
-                  .join(', ')}
+                  .map((item) => (
+                    <Avatar key={item.id} className='rounded'>
+                      <AvatarImage src={item.image || PLACEHOLDER.src} />
+                      <AvatarFallback>{item.name[0]}</AvatarFallback>
+                    </Avatar>
+                  ))}
               </div>
-              <span className='text-gray-500 truncate text-sm'>
-                {item.messages.content}
-              </span>
-            </div>
-          </Link>
-        ))}
+              <div className='w-full relative truncate py-4'>
+                <span className='text-xs text-[0.4rem] text-gray-500 font-light absolute top-2 right-0'>
+                  {new Intl.DateTimeFormat('pt-BR', {
+                    dateStyle: 'short',
+                  }).format(item.created_at)}{' '}
+                  ás{' '}
+                  {new Intl.DateTimeFormat('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }).format(item.created_at)}
+                </span>
+                <div className='text-lg font-semibold'>
+                  {item.users
+                    .filter((e) => e.id !== session.user.id)
+                    .flatMap((item) => item.name)
+                    .join(', ')}
+                </div>
+                <span className='text-gray-500 truncate text-sm'>
+                  {item.messages.content}
+                </span>
+              </div>
+            </Link>
+          ))}
       </div>
       <div className='border-l-2'>{children}</div>
     </div>
