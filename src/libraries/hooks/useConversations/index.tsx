@@ -10,11 +10,7 @@ export type TypeMessage = {
   id: string;
   type: 'text' | 'image' | 'video';
   content: string;
-  sender: {
-    id: string;
-    name: string;
-    image?: string;
-  };
+  sender: string;
   created_at: Date;
 };
 

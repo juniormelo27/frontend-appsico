@@ -11,7 +11,6 @@ import {
   useConversationMessages,
 } from '@/libraries/hooks/useConversations';
 import { cn } from '@/libraries/utils';
-import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2Icon, LucideSendHorizontal } from 'lucide-react';
@@ -28,6 +27,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { Virtuoso } from 'react-virtuoso';
 import { z } from 'zod';
+import revalidateSlotByConversationById from '../actions/revalidate/slot/conversation';
 
 const SchemaMessage = z.object({
   message: z.string().min(1),
@@ -45,7 +45,10 @@ export default function ChatScreen() {
   }>();
 
   const [connect, setConnect] = useState<boolean | null>(null);
-  const socket = useMemo(() => new WebSocket(urlWs + params.id), [params.id]);
+  const socket = useMemo(
+    () => (params.id ? new WebSocket(urlWs + params.id) : undefined),
+    [params.id]
+  );
 
   const session = useSession().data?.user.id;
   const chat = useRef<any>(null);
@@ -74,22 +77,25 @@ export default function ChatScreen() {
   });
   const validate = !SchemaMessage.safeParse(form.watch()).success;
 
-  const sendMessage = useCallback(() => {
-    socket.send(
-      JSON.stringify({
-        id: params.id,
-        type: 'text',
-        sender: session,
-        content: form.getValues('message'),
-      } as TypeMessageSend & {
-        sender: string;
-      })
-    );
+  const sendMessage = useCallback(
+    (message: string) => {
+      socket?.send(
+        JSON.stringify({
+          id: params.id,
+          type: 'text',
+          sender: session,
+          content: message,
+        } as TypeMessageSend & {
+          sender: string;
+        })
+      );
 
-    chat.current.scrollToIndex(messagesList.length);
+      chat.current.scrollToIndex(messagesList.length);
 
-    form.reset();
-  }, [socket, params.id, session, form, messagesList.length]);
+      form.reset();
+    },
+    [socket, params.id, session, form, messagesList.length]
+  );
 
   function connectUser() {
     setConnect(true);
@@ -105,26 +111,29 @@ export default function ChatScreen() {
       socket.addEventListener('error', disconnectUser);
       socket.addEventListener('message', (event: any) => {
         const data = JSON.parse(event.data) as TypeMessageSend & {
-          message: string;
           created_at: string;
         };
 
-        console.log(chat.current)
-        console.log(chat.current.autoscrollToBottom())
+        //@ts-ignore
+        setMessageList((e) => {
+          const response = [
+            ...e,
+            {
+              ...data,
+              content: data.content,
+              created_at: new Date(data.created_at),
+            },
+          ];
 
-        setMessageList((e) => [
-          ...e,
-          {
-            ...data,
-            content: data.message,
-            created_at: new Date(data.created_at),
-          },
-        ]);
+          chat.current.scrollToIndex(response.length);
+
+          return response;
+        });
       });
     }
 
     return () => {
-      socket.close();
+      socket?.close();
     };
   }, [socket]);
 
@@ -209,7 +218,12 @@ export default function ChatScreen() {
       )}
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit((value) => {})}
+          action={() => alert()}
+          onSubmit={form.handleSubmit((value) => {
+            sendMessage(value.message);
+
+            revalidateSlotByConversationById(params.id);
+          })}
           className='py-5 px-6 z-10 flex flex-row items-center justify-between gap-4 fixed bg-white bottom-0 border-t w-[calc(100vw_-_25vw)]'
         >
           <FormField
@@ -223,12 +237,7 @@ export default function ChatScreen() {
               </FormItem>
             )}
           />
-          <Button
-            size='icon'
-            type='submit'
-            disabled={!connect || validate}
-            onClick={sendMessage}
-          >
+          <Button size='icon' type='submit' disabled={!connect || validate}>
             <LucideSendHorizontal className='w-4 h-4' />
           </Button>
         </form>
@@ -246,7 +255,7 @@ function Message({
 }) {
   if (!session) return;
 
-  if (data.sender.id === session) {
+  if (data.sender === session) {
     return (
       <div className='flex justify-end mb-4'>
         <div className='flex flex-col items-end justify-end'>
@@ -265,26 +274,12 @@ function Message({
             }).format(data.created_at)}
           </span>
         </div>
-        <Image
-          src={data.sender.image || PLACEHOLDER}
-          className='object-cover h-8 w-8 rounded-full'
-          alt=''
-          width={52}
-          height={52}
-        />
       </div>
     );
   }
 
   return (
     <div className='flex justify-start mb-4'>
-      <Image
-        src={data.sender.image || PLACEHOLDER}
-        className='object-cover h-8 w-8 rounded-full'
-        alt=''
-        width={52}
-        height={52}
-      />
       <div className='items-start justify-start'>
         <div className='ml-2 py-3 px-4 bg-gray-400 rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-white'>
           {data.content}
