@@ -36,7 +36,7 @@ type TypeMessage = z.infer<typeof SchemaMessage>;
 
 const urlWs =
   process.env.NODE_ENV === 'production'
-    ? 'wss://appsico-backend-40-production.up.railway.app/chat/'
+    ? 'wss://backend-appsico-production.up.railway.app/chat/'
     : 'ws://localhost:3001/chat/';
 
 export default function ChatScreen() {
