@@ -36,7 +36,7 @@ type TypeMessage = z.infer<typeof SchemaMessage>;
 
 const urlWs =
   process.env.NODE_ENV === 'production'
-    ? 'wss://backend-appsico-production.up.railway.app/chat/'
+    ? 'wss://apiappsico.segwise.com.br/chat/'
     : 'ws://localhost:3001/chat/';
 
 export default function ChatScreen() {
@@ -44,12 +44,11 @@ export default function ChatScreen() {
     id: string;
   }>();
 
+  const [connect, setConnect] = useState<boolean | null>(null);
   const socket = useMemo(() => new WebSocket(urlWs + params.id), [params.id]);
 
   const session = useSession().data?.user.id;
   const chat = useRef<any>(null);
-
-  const [connect, setConnect] = useState<boolean | null>(null);
 
   const [timeNextPage, setTimeNextPage] = useState<boolean>(false);
 
@@ -100,29 +99,34 @@ export default function ChatScreen() {
     setConnect(false);
   }
 
-  const receiverMessage = useCallback((event: any) => {
-    const data = JSON.parse(event.data) as TypeMessageSend & {
-      message: string;
-      created_at: string;
-    };
-
-    setMessageList((e) => [
-      ...e,
-      {
-        ...data,
-        content: data.message,
-        created_at: new Date(data.created_at),
-      },
-    ]);
-  }, []);
-
   useEffect(() => {
     if (socket) {
       socket.addEventListener('open', connectUser);
       socket.addEventListener('error', disconnectUser);
-      socket.addEventListener('message', receiverMessage);
+      socket.addEventListener('message', (event: any) => {
+        const data = JSON.parse(event.data) as TypeMessageSend & {
+          message: string;
+          created_at: string;
+        };
+
+        console.log(chat.current)
+        console.log(chat.current.autoscrollToBottom())
+
+        setMessageList((e) => [
+          ...e,
+          {
+            ...data,
+            content: data.message,
+            created_at: new Date(data.created_at),
+          },
+        ]);
+      });
     }
-  }, [socket, receiverMessage]);
+
+    return () => {
+      socket.close();
+    };
+  }, [socket]);
 
   useEffect(() => {
     //@ts-ignore
