@@ -4,12 +4,8 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogOut } from '@/components/ui/logout';
@@ -17,19 +13,10 @@ import masked from '@/libraries/masked';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import authOptions from '@/services/auth';
 import {
-  LucideCloud,
-  LucideCreditCard,
-  LucideGithub,
-  LucideKeyboard,
   LucideLifeBuoy,
-  LucideMail,
-  LucideMessageSquare,
   LucidePlus,
-  LucidePlusCircle,
-  LucideSettings,
   LucideUser2,
-  LucideUserPlus2,
-  LucideUsers2,
+  MessageCircleIcon,
 } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
@@ -99,70 +86,29 @@ export default async function Header() {
                         <span>Perfil</span>
                       </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem>
-                      <LucideCreditCard className='mr-2 h-4 w-4' />
-                      <span>Billing</span>
-                      <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <LucideSettings className='mr-2 h-4 w-4' />
-                      <span>Settings</span>
-                      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <LucideKeyboard className='mr-2 h-4 w-4' />
-                      <span>Keyboard shortcuts</span>
-                      <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <LucideUsers2 className='mr-2 h-4 w-4' />
-                      <span>Team</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>
-                        <LucideUserPlus2 className='mr-2 h-4 w-4' />
-                        <span>Invite users</span>
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuItem>
-                            <LucideMail className='mr-2 h-4 w-4' />
-                            <span>Email</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <LucideMessageSquare className='mr-2 h-4 w-4' />
-                            <span>Message</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <LucidePlusCircle className='mr-2 h-4 w-4' />
-                            <span>More...</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuItem>
-                      <LucidePlus className='mr-2 h-4 w-4' />
-                      <span>New Team</span>
-                      <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                    </DropdownMenuItem>
+                    <Link href='/chat'>
+                      <DropdownMenuItem>
+                        <MessageCircleIcon className='mr-2 h-4 w-4' />
+                        <span>Chat</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href='/profissional'>
+                      <DropdownMenuItem>
+                        <LucidePlus className='mr-2 h-4 w-4' />
+                        <span>Pesquisar Profissionais</span>
+                      </DropdownMenuItem>
+                    </Link>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LucideGithub className='mr-2 h-4 w-4' />
-                    <span>GitHub</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <LucideLifeBuoy className='mr-2 h-4 w-4' />
-                    <span>Support</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem disabled>
-                    <LucideCloud className='mr-2 h-4 w-4' />
-                    <span>API</span>
-                  </DropdownMenuItem>
+                  <Link href='https://wa.me/5511948827601'>
+                    <DropdownMenuItem>
+                      <LucideLifeBuoy className='mr-2 h-4 w-4' />
+                      <span>Suporte</span>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator />
                   <LogOut>
                     <DropdownMenuItem>
