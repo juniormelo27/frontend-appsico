@@ -52,6 +52,9 @@ export const useConversationMessages = (
     QueryKey,
     string | undefined
   >({
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     queryKey: ['conversations', id, 'messages'],
     queryFn: async ({ pageParam }) => {
       const searchParams = new URLSearchParams();
