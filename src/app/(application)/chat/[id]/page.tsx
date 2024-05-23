@@ -242,7 +242,7 @@ function Message({
 }) {
   if (!session) return;
 
-  if (data.sender.id !== session) {
+  if (data.sender.id === session) {
     return (
       <div className='flex justify-end mb-4'>
         <div className='flex flex-col items-end justify-end'>
