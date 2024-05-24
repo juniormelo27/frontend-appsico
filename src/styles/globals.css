@@ -72,7 +72,7 @@
   }
   html,
   body {
-    @apply !scroll-smooth;
+    @apply !scroll-smooth font-normal;
   }
   body {
     @apply bg-background text-foreground;

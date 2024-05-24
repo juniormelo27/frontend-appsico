@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { ProfessionalResponse } from '../page';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -202,7 +201,9 @@ export default function FormUpdateUser({
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value='fsdfds' />
+                                <SelectItem value='fsdfds'>
+                                  São Paulo - SP
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -219,7 +220,7 @@ export default function FormUpdateUser({
                         <FormItem className='flex flex-col items-center justify-start'>
                           <FormLabel>E-mail:</FormLabel>
                           <FormControl>
-                            <Input {...field} className='text-center' />
+                            <Input {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -234,18 +235,18 @@ export default function FormUpdateUser({
                   <div className='text-sm leading-normal mt-4 mb-2 text-blueGray-400 font-bold uppercase'>
                     <FormField
                       control={form.control}
-                      name='Abordagem'
+                      name='profile.service'
                       render={({ field }) => (
                         <FormItem className='flex flex-col items-center justify-start'>
-                          <FormLabel>Abordagem:</FormLabel>
+                          <FormLabel>Tipo de Atendimento:</FormLabel>
                           <FormControl>
                             <Select {...field}>
                               <SelectTrigger>
-                                <SelectValue className='text-center' />
+                                <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value='fsdfds'>
-                                  fdsfdsfdsfsdf
+                                <SelectItem>
+                                  Tipo de serviço, Tipo de serviço
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -266,10 +267,10 @@ export default function FormUpdateUser({
               </div>
               <div>
                 <span className='text-base font-semibold'>Biografia:</span>
-                <Textarea />
+                <Textarea className='min-h-60' />
               </div>
               <div>
-                <div className='flex flex-row items-center justify-between'>
+                <div className='flex flex-row items-center justify-between mb-3'>
                   <span className='text-base font-semibold'>
                     Especialidades:
                   </span>
@@ -319,11 +320,11 @@ export default function FormUpdateUser({
                     </DialogContent>
                   </Dialog>
                 </div>
-                <div>
-                  {!values.profile.specialties.length && (
+                <div className='space-y-3'>
+                  {/* {!values.profile.specialties.length && (
                     <Badge>Nenhuma especialidade</Badge>
-                  )}
-                  {values.profile.specialties.map((item) => (
+                  )} */}
+                  {[...values.profile.specialties, 'Nome da especialidade', 'Nome da especialidade', 'Nome da especialidade'].map((item) => (
                     <div
                       key={item}
                       className='rounded-md border px-4 py-3 font-mono text-sm'
@@ -334,7 +335,7 @@ export default function FormUpdateUser({
                 </div>
               </div>
               <div>
-                <div className='flex flex-row items-center justify-between'>
+                <div className='flex flex-row items-center justify-between mb-3'>
                   <span className='text-base font-semibold'>Abordagem:</span>
                   <Dialog>
                     <DialogTrigger asChild>
@@ -382,11 +383,11 @@ export default function FormUpdateUser({
                     </DialogContent>
                   </Dialog>
                 </div>
-                <div>
-                  {!values.profile.approach.length && (
+                <div className='space-y-3'>
+                  {/* {!values.profile.approach.length && (
                     <Badge>Nenhuma abordagem</Badge>
-                  )}
-                  {values.profile.approach.map((item) => (
+                  )} */}
+                  {[...values.profile.approach, 'Nome da abordagem', 'Nome da abordagem', 'Nome da abordagem'].map((item) => (
                     <div
                       key={item}
                       className='rounded-md border px-4 py-3 font-mono text-sm'
