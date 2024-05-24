@@ -15,19 +15,19 @@ export default async function Hero() {
 
   const [patients, professionals, conversations] = await Promise.all([
     await http<ResponseAnalytics>('/analytics/count/patients', {
-      // next: {
-      //   revalidate: 3600,
-      // },
+      next: {
+        revalidate: 3600,
+      },
     }),
     await http<ResponseAnalytics>('/analytics/count/professionals', {
-      // next: {
-      //   revalidate: 3600,
-      // },
+      next: {
+        revalidate: 3600,
+      },
     }),
     await http<ResponseAnalytics>('/analytics/count/conversations', {
-      // next: {
-      //   revalidate: 3600,
-      // },
+      next: {
+        revalidate: 3600,
+      },
     }),
   ]);
 
