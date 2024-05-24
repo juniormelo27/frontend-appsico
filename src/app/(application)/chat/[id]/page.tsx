@@ -99,7 +99,7 @@ export default function ChatScreen() {
     setConnect(false);
   }
 
-  function receiverMessage() {
+  function receiverMessage(event: any) {
     const data = JSON.parse(event.data) as TypeMessageSend & {
       created_at: string;
     };
