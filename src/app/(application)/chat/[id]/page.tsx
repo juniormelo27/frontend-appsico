@@ -27,7 +27,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { Virtuoso } from 'react-virtuoso';
 import { z } from 'zod';
-import revalidateSlotByConversationById from '../actions/revalidate/slot/conversation';
+import revalidateSlotConversations from '../actions/revalidate/slot/conversation';
 
 const SchemaMessage = z.object({
   message: z.string().min(1),
@@ -58,13 +58,7 @@ export default function ChatScreen() {
   const messages = useConversationMessages(params.id, {
     limit: 100,
   });
-  const [messagesList, setMessageList] = useState<
-    Array<
-      TypeMessageSend & {
-        message: string;
-      }
-    >
-  >([]);
+  const [messagesList, setMessageList] = useState<Array<TypeMessageSend>>([]);
 
   const form = useForm<TypeMessage>({
     mode: 'all',
@@ -94,7 +88,7 @@ export default function ChatScreen() {
 
       form.reset();
     },
-    [socket, params.id, session, form, messagesList.length]
+    [socket, params.id, session, form, messagesList.length, chat]
   );
 
   function connectUser() {
@@ -105,37 +99,44 @@ export default function ChatScreen() {
     setConnect(false);
   }
 
+  const receiverMessage = useCallback(
+    (event: any) => {
+      const data = JSON.parse(event.data) as TypeMessageSend & {
+        created_at: string;
+      };
+
+      setMessageList((e) => {
+        const response = [
+          ...e,
+          {
+            ...data,
+            content: data.content,
+            created_at: new Date(data.created_at),
+          },
+        ];
+
+        chat.current.scrollToIndex(response.length);
+
+        revalidateSlotConversations(params.id);
+
+        return response;
+      });
+    },
+    [params.id]
+  );
+
   useEffect(() => {
     if (socket) {
+      console.log('conectado');
       socket.addEventListener('open', connectUser);
       socket.addEventListener('error', disconnectUser);
-      socket.addEventListener('message', (event: any) => {
-        const data = JSON.parse(event.data) as TypeMessageSend & {
-          created_at: string;
-        };
-
-        //@ts-ignore
-        setMessageList((e) => {
-          const response = [
-            ...e,
-            {
-              ...data,
-              content: data.content,
-              created_at: new Date(data.created_at),
-            },
-          ];
-
-          chat.current.scrollToIndex(response.length);
-
-          return response;
-        });
-      });
+      socket.addEventListener('message', receiverMessage);
     }
 
     return () => {
       socket?.close();
     };
-  }, [socket]);
+  }, [socket, chat, receiverMessage]);
 
   useEffect(() => {
     //@ts-ignore
@@ -169,60 +170,56 @@ export default function ChatScreen() {
           </span>
         </Badge>
       )}
-      {!!messagesList.length && (
-        <Virtuoso
-          ref={chat}
-          atTopThreshold={500}
-          atTopStateChange={(value) => {
-            if (value && messages.hasNextPage) {
-              if (timeNextPage) {
-                messages.fetchNextPage();
-              }
+      <Virtuoso
+        ref={chat}
+        atTopThreshold={500}
+        atTopStateChange={(value) => {
+          if (value && messages.hasNextPage) {
+            if (timeNextPage) {
+              messages.fetchNextPage();
             }
-          }}
-          initialTopMostItemIndex={messagesList.length - 1}
-          totalCount={messagesList.length}
-          className='flex flex-col z-10 justify-end items-end w-full h-full mb-20'
-          data={messagesList}
-          components={{
-            Header: () => (
-              <Fragment>
-                {messages.isFetchingNextPage && (
-                  <div className='items-center justify-center self-center flex mt-4 mb-6'>
-                    <Button
-                      variant='outline'
-                      className='mx-auto z-10 items-center justify-center w-40 rounded-full border-slate-300'
-                      isLoading
-                      disabled
-                      onClick={() => messages.fetchNextPage()}
-                    >
-                      Carregando
-                    </Button>
-                  </div>
-                )}
-              </Fragment>
-            ),
-          }}
-          itemContent={(index, data) => (
-            <div
-              className={cn(
-                'mx-6',
-                index === messages.data.length - 1 && 'pb-4',
-                index === 0 && !messages.hasNextPage && 'pt-10'
+          }
+        }}
+        initialTopMostItemIndex={messagesList.length - 1}
+        totalCount={messagesList.length || 1}
+        className='flex flex-col z-10 justify-end items-end w-full h-full mb-20'
+        data={messagesList}
+        components={{
+          Header: () => (
+            <Fragment>
+              {messages.isFetchingNextPage && (
+                <div className='items-center justify-center self-center flex mt-4 mb-6'>
+                  <Button
+                    variant='outline'
+                    className='mx-auto z-10 items-center justify-center w-40 rounded-full border-slate-300'
+                    isLoading
+                    disabled
+                    onClick={() => messages.fetchNextPage()}
+                  >
+                    Carregando
+                  </Button>
+                </div>
               )}
-            >
-              <Message key={data.id} data={data} session={session} />
-            </div>
-          )}
-        />
-      )}
+            </Fragment>
+          ),
+        }}
+        itemContent={(index, data) => (
+          <div
+            className={cn(
+              'mx-6',
+              index === messages.data.length - 1 && 'pb-4',
+              index === 0 && !messages.hasNextPage && 'pt-10'
+            )}
+          >
+            <Message key={data.id} data={data} session={session} />
+          </div>
+        )}
+      />
       <Form {...form}>
         <form
           action={() => alert()}
           onSubmit={form.handleSubmit((value) => {
             sendMessage(value.message);
-
-            revalidateSlotByConversationById(params.id);
           })}
           className='py-5 px-6 z-10 flex flex-row items-center justify-between gap-4 fixed bg-white bottom-0 border-t w-[calc(100vw_-_25vw)]'
         >
