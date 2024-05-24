@@ -99,31 +99,28 @@ export default function ChatScreen() {
     setConnect(false);
   }
 
-  const receiverMessage = useCallback(
-    (event: any) => {
-      const data = JSON.parse(event.data) as TypeMessageSend & {
-        created_at: string;
-      };
+  function receiverMessage() {
+    const data = JSON.parse(event.data) as TypeMessageSend & {
+      created_at: string;
+    };
 
-      setMessageList((e) => {
-        const response = [
-          ...e,
-          {
-            ...data,
-            content: data.content,
-            created_at: new Date(data.created_at),
-          },
-        ];
+    setMessageList((e) => {
+      const response = [
+        ...e,
+        {
+          ...data,
+          content: data.content,
+          created_at: new Date(data.created_at),
+        },
+      ];
 
-        chat.current.scrollToIndex(response.length);
+      chat.current.scrollToIndex(response.length);
 
-        revalidateSlotConversations(params.id);
+      revalidateSlotConversations();
 
-        return response;
-      });
-    },
-    [params.id]
-  );
+      return response;
+    });
+  }
 
   useEffect(() => {
     if (socket) {
@@ -136,7 +133,7 @@ export default function ChatScreen() {
     return () => {
       socket?.close();
     };
-  }, [socket, chat, receiverMessage]);
+  }, [socket, chat]);
 
   useEffect(() => {
     //@ts-ignore
