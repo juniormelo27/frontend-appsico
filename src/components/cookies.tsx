@@ -216,7 +216,7 @@ export default function CookiesAccepts({
               </Link>{' '}
               aprender mais.
             </span>
-            <form action={acceptCookies} className='mt-5 inline-flex gap-x-2'>
+            <form action={acceptCookies} className='mt-5 inline-flex gap-x-2 ml-3'>
               <ToastPrimitives.Close asChild>
                 <Button
                   type='submit'
