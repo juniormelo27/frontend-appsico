@@ -37,6 +37,8 @@ export default function ProfessionalScreen(props: {
   const { data, isPending, error, refetch } = useProfessionals(
     {
       ...props.searchParams,
+      //@ts-expect-error
+      viewed: undefined,
       address:
         props.searchParams.state || props.searchParams.city
           ? {
