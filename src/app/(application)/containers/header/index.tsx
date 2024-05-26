@@ -82,25 +82,25 @@ export default async function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent sideOffset={8} className='w-56'>
                   <DropdownMenuGroup>
+                    <Link href='/profissional'>
+                      <DropdownMenuItem>
+                        <LucideSearch className='mr-2 h-4 w-4' />
+                        <span>Pesquisar Profissionais</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
                     <Link href='/perfil'>
                       <DropdownMenuItem>
                         <LucideUser2 className='mr-2 h-4 w-4' />
                         <span>Perfil</span>
                       </DropdownMenuItem>
                     </Link>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
                     <Link href='/chat'>
                       <DropdownMenuItem>
                         <MessageCircleIcon className='mr-2 h-4 w-4' />
                         <span>Chat</span>
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link href='/profissional'>
-                      <DropdownMenuItem>
-                        <LucideSearch className='mr-2 h-4 w-4' />
-                        <span>Pesquisar Profissionais</span>
                       </DropdownMenuItem>
                     </Link>
                   </DropdownMenuGroup>

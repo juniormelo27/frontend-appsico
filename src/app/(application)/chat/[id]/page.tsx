@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
@@ -13,6 +12,7 @@ import {
 } from '@/libraries/hooks/useConversations';
 import masked from '@/libraries/masked';
 import { cn } from '@/libraries/utils';
+import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
 import http from '@/services/fetch';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,20 +20,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2Icon, LucideSendHorizontal } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Virtuoso } from 'react-virtuoso';
 import { z } from 'zod';
 import { revalidateSlotConversations } from '../../../../libraries/actions/revalidate';
-import type { ResponseConversation } from './layout';
-
+import type { ResponseConversation } from '../layout';
 const SchemaMessage = z.object({
   message: z.string().min(1),
 });
@@ -136,7 +128,7 @@ export default function ChatScreen() {
         },
       ];
 
-      chat.current.scrollToIndex(response.length);
+      chat.current.autoscrollToBottom();
 
       revalidateSlotConversations();
 
@@ -168,42 +160,66 @@ export default function ChatScreen() {
   }, []);
 
   return (
-    <div className='w-full h-full flex flex-col justify-between relative overflow-hidden'>
+    <div className='w-full h-full flex flex-col justify-between'>
       <Image
         src={WALLPAPER}
         alt='wallpaper'
         className='w-full h-full invert opacity-5 object-cover absolute z-0'
       />
-      <div className='w-full bg-white flex flex-row px-2 items-center border-b-2 truncate z-10 h-20'>
-        <div className='mr-3'>
-          {conversationEmpty.data?.users
-            .filter((e) => e.id !== session)
-            .map((item) => (
-              <Avatar key={item.id} className='rounded'>
-                <AvatarImage src={item.image} />
-                <AvatarFallback className='rounded uppercase'>
-                  {item.name[0]}
-                  {item.name?.[1]}
-                </AvatarFallback>
-              </Avatar>
-            ))}
-        </div>
-        <div className='w-full relative truncate py-4 z-10'>
-          <div className='text-lg font-semibold'>
+      <div className='w-full flex flex-col z-10'>
+        <div className='w-full bg-white flex flex-row px-2 items-center border-b-2 truncate h-[calc(4rem_+_0.05rem)]'>
+          <div className='mr-3'>
+            {conversationEmpty.isPending && (
+              <div className='w-10 h-10 rounded bg-slate-100' />
+            )}
             {conversationEmpty.data?.users
               .filter((e) => e.id !== session)
-              .flatMap((item) => masked.name(item.name))
-              .join(', ')}
+              .map((item) => (
+                <Image
+                  key={item.id}
+                  src={item.image || PLACEHOLDER}
+                  placeholder='blur'
+                  blurDataURL={PLACEHOLDER.blurDataURL}
+                  className='w-10 h-10 rounded'
+                  width={512}
+                  height={512}
+                  alt=''
+                />
+              ))}
+          </div>
+          <div className='w-full relative truncate py-4 z-10 flex-1'>
+            <div className='text-lg font-semibold'>
+              {conversationEmpty.isPending && (
+                <div className='w-32 h-6 rounded bg-slate-100' />
+              )}
+              {conversationEmpty.data?.users
+                .filter((e) => e.id !== session)
+                .flatMap((item) => masked.name(item.name))
+                .join(', ')}
+            </div>
           </div>
         </div>
+        {connect === null && (
+          <Badge className='w-full bg-gray-400 uppercase border-b rounded-none z-10 text-center items-center justify-center'>
+            <span className='flex flex-row items-center justify-center gap-2'>
+              conectando <Loader2Icon className='w-3 h-3 animate-spin' />
+            </span>
+          </Badge>
+        )}
+        {messages.isFetchingNextPage && (
+          <div className='items-center justify-center self-center flex mt-4 mb-6'>
+            <Button
+              variant='outline'
+              className='mx-auto z-10 items-center justify-center w-40 rounded-full border-slate-300'
+              isLoading
+              disabled
+              onClick={() => messages.fetchNextPage()}
+            >
+              Carregando
+            </Button>
+          </div>
+        )}
       </div>
-      {connect === null && (
-        <Badge className='w-full bg-gray-400 uppercase border-b rounded-none z-10 text-center items-center justify-center'>
-          <span className='flex flex-row items-center justify-center gap-2'>
-            conectando <Loader2Icon className='w-3 h-3 animate-spin' />
-          </span>
-        </Badge>
-      )}
       <Virtuoso
         ref={chat}
         atTopThreshold={500}
@@ -216,32 +232,15 @@ export default function ChatScreen() {
         }}
         initialTopMostItemIndex={messagesList.length - 1}
         totalCount={messagesList.length || 1}
-        className='flex flex-col z-10 justify-end items-end w-full h-full mb-20'
+        className='flex flex-col z-0 justify-end items-end w-full h-full'
         data={messagesList}
         components={{
-          Header: () => (
-            <Fragment>
-              {messages.isFetchingNextPage && (
-                <div className='items-center justify-center self-center flex mt-4 mb-6'>
-                  <Button
-                    variant='outline'
-                    className='mx-auto z-10 items-center justify-center w-40 rounded-full border-slate-300'
-                    isLoading
-                    disabled
-                    onClick={() => messages.fetchNextPage()}
-                  >
-                    Carregando
-                  </Button>
-                </div>
-              )}
-            </Fragment>
-          ),
+          Footer: () => <div className='h-16' />,
         }}
         itemContent={(index, data) => (
           <div
             className={cn(
               'mx-6',
-              index === messages.data.length - 1 && 'pb-4',
               index === 0 && !messages.hasNextPage && 'pt-10'
             )}
           >
@@ -251,11 +250,10 @@ export default function ChatScreen() {
       />
       <Form {...form}>
         <form
-          action={() => alert()}
           onSubmit={form.handleSubmit((value) => {
             sendMessage(value.message);
           })}
-          className='py-5 px-6 z-10 flex flex-row items-center justify-between gap-4 fixed bg-white bottom-0 border-t w-[calc(100vw_-_25vw)]'
+          className='py-5 px-6 flex flex-row items-center justify-between gap-4 bg-white bottom-0 border-t-2 w-[calc(100vw_-_25vw)] z-10'
         >
           <FormField
             control={form.control}
