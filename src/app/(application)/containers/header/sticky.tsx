@@ -45,7 +45,7 @@ export default function StickyScroll({
   return (
     <div
       className={cn(
-        'w-full sticky top-0 z-50 bg-white transition-all px-24',
+        'w-full sticky top-0 z-50 bg-white transition-all px-24 max-md:px-6',
         sticky ? 'shadow' : '',
         isPaddingNormal && 'px-6'
       )}
