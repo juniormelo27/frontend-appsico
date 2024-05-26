@@ -21,6 +21,7 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import MultiSelect from '@/components/ui/multi-select';
 import {
   Select,
   SelectContent,
@@ -31,6 +32,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   useProfessionalsApproach,
+  useProfessionalsServices,
   useProfessionalsSpecialties,
 } from '@/libraries/hooks/useProfessional';
 import masked from '@/libraries/masked';
@@ -135,6 +137,7 @@ export default function FormUpdateUser({
 
   const specialties = useProfessionalsSpecialties();
   const approach = useProfessionalsApproach();
+  const services = useProfessionalsServices();
 
   return (
     <Form {...form}>
@@ -188,73 +191,63 @@ export default function FormUpdateUser({
                   </h3>
                 </center>
                 <div className='pl-16 pr-20'>
-                  <div className='text-sm leading-normal mt-4 mb-2 text-blueGray-400 font-bold uppercase'>
-                    <FormField
-                      control={form.control}
-                      name='address.city'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col items-center justify-start'>
-                          <FormLabel>Cidade de atividade:</FormLabel>
-                          <FormControl>
-                            <Select {...field}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value='fsdfds'>
-                                  São Paulo - SP
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  {/* <ButtonChat id={id} /> */}
-                  <div className='text-sm leading-normal mt-4 mb-2 text-blueGray-400 font-bold uppercase'>
-                    <FormField
-                      control={form.control}
-                      name='email'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col items-center justify-start'>
-                          <FormLabel>E-mail:</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  {/* <div className='mb-2 text-blueGray-600 mt-10 capitalize flex flex-col'>
-                  <span className='text-base font-semibold'>Contato</span>
-                  <span className='text-gray-500 text-sm lowercase'>
-                    {masked.phone(data.phone.slice(2))}
-                  </span>
-                </div> */}
-                  <div className='text-sm leading-normal mt-4 mb-2 text-blueGray-400 font-bold uppercase'>
-                    <FormField
-                      control={form.control}
-                      name='profile.service'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col items-center justify-start'>
-                          <FormLabel>Tipo de Atendimento:</FormLabel>
-                          <FormControl>
-                            <Select {...field}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem>
-                                  Tipo de serviço, Tipo de serviço
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col items-center justify-start'>
+                        <FormLabel>E-mail:</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder='E-mail' />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col items-center justify-start'>
+                        <FormLabel>E-mail:</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder='E-mail' />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  {/* <FormField
+                    control={form.control}
+                    name='phone'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col items-center justify-start'>
+                        <FormLabel>Contato:</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder='(00) 00000-0000' />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  /> */}
+                  <FormField
+                    control={form.control}
+                    name='profile.service'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de atendimento:</FormLabel>
+                        <FormControl>
+                          <MultiSelect
+                            {...field}
+                            defaultValue={field.value}
+                            placeholder='Tipo de atendimento'
+                            onValueChange={(value) => field.onChange(value)}
+                            options={approach.data?.map((item) => ({
+                              value: item.id,
+                              label: item.name,
+                            }))}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
             </div>
@@ -324,7 +317,12 @@ export default function FormUpdateUser({
                   {/* {!values.profile.specialties.length && (
                     <Badge>Nenhuma especialidade</Badge>
                   )} */}
-                  {[...values.profile.specialties, 'Nome da especialidade', 'Nome da especialidade', 'Nome da especialidade'].map((item) => (
+                  {[
+                    ...values.profile.specialties,
+                    'Nome da especialidade',
+                    'Nome da especialidade',
+                    'Nome da especialidade',
+                  ].map((item) => (
                     <div
                       key={item}
                       className='rounded-md border px-4 py-3 font-mono text-sm'
@@ -387,7 +385,12 @@ export default function FormUpdateUser({
                   {/* {!values.profile.approach.length && (
                     <Badge>Nenhuma abordagem</Badge>
                   )} */}
-                  {[...values.profile.approach, 'Nome da abordagem', 'Nome da abordagem', 'Nome da abordagem'].map((item) => (
+                  {[
+                    ...values.profile.approach,
+                    'Nome da abordagem',
+                    'Nome da abordagem',
+                    'Nome da abordagem',
+                  ].map((item) => (
                     <div
                       key={item}
                       className='rounded-md border px-4 py-3 font-mono text-sm'

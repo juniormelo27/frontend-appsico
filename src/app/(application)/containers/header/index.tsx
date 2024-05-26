@@ -14,7 +14,7 @@ import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import authOptions from '@/services/auth';
 import {
   LucideLifeBuoy,
-  LucidePlus,
+  LucideSearch,
   LucideUser2,
   MessageCircleIcon,
 } from 'lucide-react';
@@ -73,6 +73,8 @@ export default async function Header() {
                       src={PLACEHOLDER}
                       width={512}
                       height={512}
+                      placeholder='blur'
+                      blurDataURL={PLACEHOLDER.blurDataURL}
                       alt='img-profile'
                       className='w-12 h-12 rounded-full'
                     />
@@ -97,7 +99,7 @@ export default async function Header() {
                     </Link>
                     <Link href='/profissional'>
                       <DropdownMenuItem>
-                        <LucidePlus className='mr-2 h-4 w-4' />
+                        <LucideSearch className='mr-2 h-4 w-4' />
                         <span>Pesquisar Profissionais</span>
                       </DropdownMenuItem>
                     </Link>
@@ -137,7 +139,6 @@ export default async function Header() {
                     </Button>
                   </Link>
                 </div>
-
                 <button className='block rounded bg-gray-100 p-2.5 text-gray-600 transition hover:text-gray-600/75 md:hidden'>
                   <span className='sr-only'>Toggle menu</span>
                   <svg

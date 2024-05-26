@@ -56,20 +56,6 @@ const Schema = z.object({
 
 type Type = z.infer<typeof Schema>;
 
-const states = [
-  {
-    id: 'fdsfdsfdsf',
-    name: 'fdsfdsfdsfdsfdsfs',
-  },
-];
-
-const cities = [
-  {
-    id: 'fdsfdsfdsf',
-    name: 'fdsfdsfdsfdsfdsfs',
-  },
-];
-
 export default function Filter() {
   const router = useRouter();
   const pathname = usePathname();
@@ -191,8 +177,43 @@ export default function Filter() {
     return router.push(url);
   }
 
+  const isClear = useMemo(() => {
+    const searchParams = new URLSearchParams(params);
+
+    if (params.size === 0) {
+      return false;
+    }
+
+    if (params.size === 1 && !!searchParams.get('viewed')) {
+      return false;
+    }
+    if (params.size === 1 && !!searchParams.get('cursor')) {
+      return false;
+    }
+
+    if (
+      params.size >= 1 &&
+      params.size <= 2 &&
+      !!searchParams.get('viewed') &&
+      !!searchParams.get('cursor')
+    ) {
+      return false;
+    }
+
+    return true;
+  }, [params]);
+
   function clear() {
-    return router.push(pathname);
+    const searchParams = new URLSearchParams();
+
+    const viewed = new URLSearchParams(params).get('viewed');
+
+    if (!!viewed) {
+      searchParams.set('viewed', viewed);
+    }
+
+    const url = `${pathname}?${searchParams.toString()}`;
+    return router.push(url);
   }
 
   useEffect(() => {
@@ -247,7 +268,7 @@ export default function Filter() {
       >
         <div className='flex flex-row items-center justify-between gap-4'>
           <h1 className='text-2xl font-bold -mb-6'>Filtros:</h1>
-          {!!params.size && (
+          {!!isClear && (
             <Button
               size='icon'
               type='button'
@@ -399,8 +420,8 @@ export default function Filter() {
                                         ? undefined
                                         : current
                                     );
-                                    
-                                    form.setValue('address.city', '')
+
+                                    form.setValue('address.city', '');
 
                                     setOpenState(false);
                                   }}

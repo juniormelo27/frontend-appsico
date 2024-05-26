@@ -10,7 +10,7 @@ import { cookies } from 'next/headers';
 const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'AppSico',
+  title: 'Appsico',
   description: 'Encontre seu psicólogo na appsico',
 };
 

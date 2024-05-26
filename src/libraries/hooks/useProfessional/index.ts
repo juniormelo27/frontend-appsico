@@ -1,5 +1,5 @@
 import http from '@/services/fetch';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export type RequestFindManyProfessionals = {
   cursor?: string;
@@ -8,11 +8,13 @@ export type RequestFindManyProfessionals = {
   validated?: boolean;
   specialties?: Array<string>;
   approach?: Array<string>;
-  service?: Array<string>;
+  services?: Array<string>;
   address?: {
     state?: string;
     city?: string;
   };
+  exacts?: Array<string>;
+  removes?: Array<string>;
 };
 
 type ResponseFindManyProfessionals = {
@@ -40,48 +42,65 @@ type ResponseFindManyProfessionals = {
 };
 
 export const useProfessionals = (
-  props: RequestFindManyProfessionals = {
+  data: RequestFindManyProfessionals = {
     limit: 30,
+  },
+  props: {
+    enabled?: boolean;
+  } = {
+    enabled: true,
   }
 ) =>
   useQuery<ResponseFindManyProfessionals>({
-    queryKey: ['professional', props],
+    queryKey: ['professional', data],
     queryFn: async ({ signal }) => {
       const searchParams = new URLSearchParams();
 
-      if (props.cursor) {
-        searchParams.set('cursor', props.cursor);
+      if (data.cursor) {
+        searchParams.set('cursor', data.cursor);
       }
-      if (props.limit) {
-        searchParams.set('limit', props.limit.toString());
+      if (data.limit) {
+        searchParams.set('limit', data.limit.toString());
       }
-      if (!!props.search?.length) {
-        searchParams.set('search', props.search);
+      if (!!data.search?.length) {
+        searchParams.set('search', data.search);
       }
-      if (props.validated) {
-        searchParams.set('validated', String(props.validated));
+      if (data.validated) {
+        searchParams.set('validated', String(data.validated));
       }
-      if (props.specialties) {
-        for (const item of props.specialties) {
+
+      if (!!data.specialties?.length) {
+        for (const item of data.specialties) {
           searchParams.append('specialties', item);
         }
       }
-      if (props.approach) {
-        for (const item of props.approach) {
+      if (!!data.approach?.length) {
+        for (const item of data.approach) {
           searchParams.append('approach', item);
         }
       }
-      if (props.service) {
-        for (const item of props.service) {
-          searchParams.append('service', item);
+      if (!!data.services?.length) {
+        for (const item of data.services) {
+          searchParams.append('services', item);
         }
       }
 
-      if (props.address?.state) {
-        searchParams.set('state', props.address.state);
+      if (data.address?.state) {
+        searchParams.set('state', data.address.state);
       }
-      if (props.address?.city) {
-        searchParams.set('city', props.address.city);
+      if (data.address?.city) {
+        searchParams.set('city', data.address.city);
+      }
+
+      if (!!data.exacts?.length) {
+        for (const item of data.exacts) {
+          searchParams.append('exacts', item);
+        }
+      }
+      if (!!data.removes?.length) {
+        for (const item of data.removes) {
+          searchParams.append('removes', item);
+        }
       }
 
       const response = await http<ResponseFindManyProfessionals>(
@@ -94,6 +113,7 @@ export const useProfessionals = (
 
       return response;
     },
+    enabled: props.enabled,
   });
 
 export const useProfessionalsSpecialties = () =>
@@ -186,4 +206,53 @@ export const useProfessionalsCities = (state?: string) =>
       return response;
     },
     enabled: !!state ? true : false,
+  });
+
+export const useProfessionalsConversationVerify = () =>
+  useMutation<
+    {
+      id: string;
+    },
+    Error,
+    {
+      id: string;
+      session: string;
+    }
+  >({
+    mutationFn: async ({ id, session }) => {
+      const response = await http<{
+        id: string;
+      }>(`/conversations/verify`, {
+        method: 'POST',
+        body: JSON.stringify([id, session]),
+      });
+
+      return response;
+    },
+  });
+
+export const useProfessionalsFollowAndUnfollow = () =>
+  useMutation<
+    {
+      message: string;
+    },
+    Error,
+    {
+      id: string;
+      user: string;
+      action: 'follow' | 'unfollow';
+    }
+  >({
+    mutationFn: async ({ id, user, action }) => {
+      const response = await http<{
+        message: string;
+      }>(`/professionals/${id}/social/${action}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          user,
+        }),
+      });
+
+      return response;
+    },
   });

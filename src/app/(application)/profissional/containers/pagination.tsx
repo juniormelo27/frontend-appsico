@@ -96,10 +96,13 @@ export function TabGrid() {
 
   const type = params.get('viewed');
 
-  function onChange(value: 'grid' | 'list') {
+  function onChange() {
     const searchParams = new URLSearchParams(params);
 
-    searchParams.set('viewed', value);
+    searchParams.set(
+      'viewed',
+      !type ? 'list' : type === 'grid' ? 'list' : 'grid'
+    );
 
     const url = `${pathname}?${searchParams.toString()}`;
 
@@ -109,14 +112,14 @@ export function TabGrid() {
   return (
     <Tabs
       value={!type ? 'grid' : type === 'list' ? 'list' : 'grid'}
-      onValueChange={(value) => onChange(value as 'grid' | 'list')}
+      onClick={onChange}
     >
-      <TabsList>
-        <TabsTrigger value='grid'>
-          <LucideLayoutGrid />
+      <TabsList className='h-9 text-slate-400'>
+        <TabsTrigger value='grid' className='h-7 text-sm gap-x-1 px-2'>
+          <LucideLayoutGrid className='w-4 h-4' /> Grade
         </TabsTrigger>
-        <TabsTrigger value='list'>
-          <LucideList />
+        <TabsTrigger value='list' className='h-7 text-sm gap-x-1 px-2'>
+          <LucideList className='w-4 h-4' /> Lista
         </TabsTrigger>
       </TabsList>
     </Tabs>

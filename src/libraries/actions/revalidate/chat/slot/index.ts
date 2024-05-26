@@ -2,6 +2,6 @@
 
 import { revalidateTag } from 'next/cache';
 
-export default async function revalidateSlotConversations() {
+export async function revalidateSlotConversations() {
   revalidateTag(`conversation.slots`);
 }

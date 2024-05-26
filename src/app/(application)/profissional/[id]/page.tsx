@@ -1,9 +1,12 @@
 import masked from '@/libraries/masked';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
+import authOptions from '@/services/auth';
 import http from '@/services/fetch';
+import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import ButtonChat from './button-chat';
+import ButtonChat from './buttonChat';
+import ButtonFollowAndUnfollow from './buttonFollowAndUnfollow';
 
 type ProfessionalResponse = {
   id: string;
@@ -48,12 +51,23 @@ export default async function ProfessionalDetailsScreen({
     id: string;
   };
 }) {
-  const data = await http<ProfessionalResponse>(`/professionals/${id}`, {
-    method: 'GET',
-    next: {
-      revalidate: 300,
-    },
-  });
+  const session = await getServerSession(authOptions);
+
+  const [data, subscriber] = await Promise.all([
+    http<ProfessionalResponse>(`/professionals/${id}`, {
+      method: 'GET',
+      next: {
+        tags: [`professional.${id}`],
+      },
+    }),
+    http<boolean>(
+      `/professionals/${id}/social/verify/?user=${session?.user.id!}`,
+      {
+        method: 'GET',
+        cache: 'no-cache',
+      }
+    ),
+  ]);
 
   if (!data) {
     redirect('/profissionais');
@@ -72,31 +86,36 @@ export default async function ProfessionalDetailsScreen({
                       width={1280}
                       height={1280}
                       alt='image'
+                      placeholder='blur'
+                      blurDataURL={PLACEHOLDER.blurDataURL}
                       className='z-10 w-56 h-56 rounded-full'
                     />
                   </div>
+                  <ButtonFollowAndUnfollow id={id} subscriber={subscriber} />
                 </div>
               </div>
               <div className='text-center mt-6'>
                 <div className='flex justify-center'>
-                  {/* <div className='flex justify-center'>
-                  <div className='lg:mr-4 p-3 text-center'>
-                    <span className='text-xl font-bold block uppercase tracking-wide text-blueGray-600'>
-                      {data._count.followers}
-                    </span>
-                    <span className='text-sm text-blueGray-400'>
-                      Seguidores
-                    </span>
+                  <div className='flex justify-center'>
+                    <div className='lg:mr-4 p-3 text-center'>
+                      <span className='text-xl font-bold block uppercase tracking-wide text-blueGray-600'>
+                        {data._count.followers}
+                      </span>
+                      <span className='text-sm text-blueGray-400'>
+                        Seguidores
+                      </span>
+                    </div>
                   </div>
-                </div> */}
-                  {/* <div className='flex justify-center'>
-                  <div className='lg:mr-4 p-3 text-center'>
-                    <span className='text-xl font-bold block uppercase tracking-wide text-blueGray-600'>
-                      {data._count.followers}
-                    </span>
-                    <span className='text-sm text-blueGray-400'>Seguindo</span>
+                  <div className='flex justify-center'>
+                    <div className='lg:mr-4 p-3 text-center'>
+                      <span className='text-xl font-bold block uppercase tracking-wide text-blueGray-600'>
+                        {data._count.following}
+                      </span>
+                      <span className='text-sm text-blueGray-400'>
+                        Seguindo
+                      </span>
+                    </div>
                   </div>
-                </div> */}
                   <div className='lg:mr-4 p-3 text-center'>
                     <span className='text-xl font-bold block uppercase tracking-wide text-blueGray-600'>
                       {data._count.connections}

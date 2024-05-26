@@ -18,8 +18,9 @@ import {
   useProfessionals,
 } from '@/libraries/hooks/useProfessional';
 import masked from '@/libraries/masked';
-import { cn } from '@/libraries/utils';
+import { cn, transformSearchParamsToArray } from '@/libraries/utils';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
+import { useSession } from 'next-auth/react';
 import Pagination, { TabGrid } from './containers/pagination';
 
 const LIMIT = 24;
@@ -31,18 +32,29 @@ export default function ProfessionalScreen(props: {
     city?: string;
   };
 }) {
-  const { data, isPending, error, refetch } = useProfessionals({
-    ...props.searchParams,
-    address:
-      props.searchParams.state || props.searchParams.city
-        ? {
-            state: props.searchParams.state,
-            city: props.searchParams.city,
-          }
-        : undefined,
-    limit: LIMIT,
-    validated: true,
-  });
+  const session = useSession();
+
+  const { data, isPending, error, refetch } = useProfessionals(
+    {
+      ...props.searchParams,
+      address:
+        props.searchParams.state || props.searchParams.city
+          ? {
+              state: props.searchParams.state,
+              city: props.searchParams.city,
+            }
+          : undefined,
+      specialties: transformSearchParamsToArray(props.searchParams.specialties),
+      approach: transformSearchParamsToArray(props.searchParams.approach),
+      services: transformSearchParamsToArray(props.searchParams.services),
+      removes: transformSearchParamsToArray(session.data?.user.id),
+      limit: LIMIT,
+      validated: true,
+    },
+    {
+      enabled: !!session.data?.user.id,
+    }
+  );
 
   return (
     <main className='grid grid-cols-[25vw_auto] max-md:grid-cols-1 relative overflow-visible'>
@@ -134,6 +146,8 @@ export default function ProfessionalScreen(props: {
                     src={item.image || PLACEHOLDER}
                     width={400}
                     height={300}
+                    placeholder='blur'
+                    blurDataURL={PLACEHOLDER.blurDataURL}
                   />
                   <div className='p-4 flex flex-col h-full justify-between'>
                     <div className='flex-1'>

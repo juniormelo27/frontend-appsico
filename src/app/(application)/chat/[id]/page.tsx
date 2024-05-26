@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
@@ -10,9 +11,12 @@ import {
   TypeMessage as TypeMessageSend,
   useConversationMessages,
 } from '@/libraries/hooks/useConversations';
+import masked from '@/libraries/masked';
 import { cn } from '@/libraries/utils';
 import WALLPAPER from '@/public/images/wallpaper-whatsapp-background.png';
+import http from '@/services/fetch';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
 import { Loader2Icon, LucideSendHorizontal } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
@@ -27,7 +31,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { Virtuoso } from 'react-virtuoso';
 import { z } from 'zod';
-import revalidateSlotConversations from '../actions/revalidate/slot/conversation';
+import { revalidateSlotConversations } from '../../../../libraries/actions/revalidate';
+import type { ResponseConversation } from './layout';
 
 const SchemaMessage = z.object({
   message: z.string().min(1),
@@ -70,6 +75,23 @@ export default function ChatScreen() {
     },
   });
   const validate = !SchemaMessage.safeParse(form.watch()).success;
+
+  const conversationEmpty = useQuery<ResponseConversation>({
+    queryKey: ['conversation', 'slot', params.id, 'header'],
+    queryFn: async ({ signal }) =>
+      await http<ResponseConversation>(
+        `/conversations/slots/${session}/${params.id}`,
+        {
+          signal,
+          method: 'GET',
+          next: {
+            tags: [`conversation.slots.${params.id}`],
+          },
+          cache: 'no-cache',
+        }
+      ),
+    enabled: !!params.id && !!session,
+  });
 
   const sendMessage = useCallback(
     (message: string) => {
@@ -124,7 +146,6 @@ export default function ChatScreen() {
 
   useEffect(() => {
     if (socket) {
-      console.log('conectado');
       socket.addEventListener('open', connectUser);
       socket.addEventListener('error', disconnectUser);
       socket.addEventListener('message', receiverMessage);
@@ -153,17 +174,33 @@ export default function ChatScreen() {
         alt='wallpaper'
         className='w-full h-full invert opacity-5 object-cover absolute z-0'
       />
+      <div className='w-full bg-white flex flex-row px-2 items-center border-b-2 truncate z-10 h-20'>
+        <div className='mr-3'>
+          {conversationEmpty.data?.users
+            .filter((e) => e.id !== session)
+            .map((item) => (
+              <Avatar key={item.id} className='rounded'>
+                <AvatarImage src={item.image} />
+                <AvatarFallback className='rounded uppercase'>
+                  {item.name[0]}
+                  {item.name?.[1]}
+                </AvatarFallback>
+              </Avatar>
+            ))}
+        </div>
+        <div className='w-full relative truncate py-4 z-10'>
+          <div className='text-lg font-semibold'>
+            {conversationEmpty.data?.users
+              .filter((e) => e.id !== session)
+              .flatMap((item) => masked.name(item.name))
+              .join(', ')}
+          </div>
+        </div>
+      </div>
       {connect === null && (
-        <Badge className='bg-gray-400 uppercase border-b rounded-none z-10 text-center items-center justify-center'>
+        <Badge className='w-full bg-gray-400 uppercase border-b rounded-none z-10 text-center items-center justify-center'>
           <span className='flex flex-row items-center justify-center gap-2'>
             conectando <Loader2Icon className='w-3 h-3 animate-spin' />
-          </span>
-        </Badge>
-      )}
-      {connect === false && (
-        <Badge className='bg-red-400 uppercase border-b rounded-none z-10 text-center items-center justify-center'>
-          <span className='flex flex-row items-center justify-center gap-2'>
-            desconectado
           </span>
         </Badge>
       )}

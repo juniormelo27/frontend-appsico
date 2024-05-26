@@ -4,17 +4,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import masked from '@/libraries/masked';
 import { cn } from '@/libraries/utils';
-import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import authOptions from '@/services/auth';
 import http from '@/services/fetch';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+export type ResponseConversation = {
+  id: string;
+  users: Array<{
+    id: string;
+    name: string;
+    image?: string;
+  }>;
+  message: {
+    id: string;
+    type: 'text' | 'image' | 'video';
+    content: string;
+    created_at: Date;
+  };
+  created_at: Date;
+};
+
 export default async function ChatScreen({
   children,
-  ...prop
+  ...props
 }: Readonly<{
   children: React.ReactNode;
   params: {
@@ -39,27 +55,16 @@ export default async function ChatScreen({
 
   const conversations = await Promise.all(
     slots.data.map((item) =>
-      http<{
-        id: string;
-        users: Array<{
-          id: string;
-          name: string;
-          image?: string;
-        }>;
-        message: {
-          id: string;
-          type: 'text' | 'image' | 'video';
-          content: string;
-          created_at: Date;
-        };
-        created_at: Date;
-      }>(`/conversations/slots/${session.user.id}/${item}`, {
-        method: 'GET',
-        next: {
-          tags: [`conversation.slots.${item}`],
-        },
-        cache: 'no-cache',
-      }).then((response) => ({
+      http<ResponseConversation>(
+        `/conversations/slots/${session.user.id}/${item}`,
+        {
+          method: 'GET',
+          next: {
+            tags: [`conversation.slots.${item}`],
+          },
+          cache: 'no-cache',
+        }
+      ).then((response) => ({
         ...response,
         message: {
           ...response.message,
@@ -73,7 +78,7 @@ export default async function ChatScreen({
   return (
     <div className='grid grid-cols-[25vw_auto] bg-white flex-1'>
       <div className='flex flex-col overflow-y-auto sticky self-start top-20 left-0'>
-        <div className='border-b-2 py-4 px-4 flex flex-row items-center gap-0 w-full'>
+        <div className='border-b-2 px-4 flex flex-row items-center gap-0 w-full h-[calc(5rem_-_.94rem)]'>
           <Button
             size='icon'
             variant='ghost'
@@ -97,7 +102,7 @@ export default async function ChatScreen({
               key={item.id}
               className={cn(
                 'flex flex-row px-2 items-center border-b-2 truncate',
-                prop.params.id === item.id && 'bg-slate-100'
+                props.params.id === item.id && 'bg-slate-100'
               )}
               href={`/chat/${item.id}`}
               replace
@@ -107,9 +112,10 @@ export default async function ChatScreen({
                   .filter((e) => e.id !== session.user.id)
                   .map((item) => (
                     <Avatar key={item.id} className='rounded'>
-                      <AvatarImage src={item.image || PLACEHOLDER.src} />
-                      <AvatarFallback className='rounded'>
+                      <AvatarImage src={item.image} />
+                      <AvatarFallback className='rounded uppercase'>
                         {item.name[0]}
+                        {item.name?.[1]}
                       </AvatarFallback>
                     </Avatar>
                   ))}
@@ -128,7 +134,7 @@ export default async function ChatScreen({
                 <div className='text-lg font-semibold'>
                   {item.users
                     .filter((e) => e.id !== session.user.id)
-                    .flatMap((item) => item.name)
+                    .flatMap((item) => masked.name(item.name))
                     .join(', ')}
                 </div>
                 <span className='text-gray-500 truncate text-sm'>
@@ -138,7 +144,7 @@ export default async function ChatScreen({
             </Link>
           ))}
       </div>
-      <div className='border-l-2'>{children}</div>
+      <div className='border-l-2 relative'>{children}</div>
     </div>
   );
 }

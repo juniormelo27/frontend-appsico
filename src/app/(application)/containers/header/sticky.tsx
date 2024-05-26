@@ -12,6 +12,9 @@ export default function StickyScroll({
   const pathname = usePathname();
   const [sticky, setSticky] = useState<boolean>(false);
 
+  const isPaddingNormal =
+    pathname.startsWith('/chat') || pathname.startsWith('/profissional');
+
   const isSticky = useCallback(() => {
     if (pathname !== '/') {
       return setSticky(true);
@@ -44,7 +47,7 @@ export default function StickyScroll({
       className={cn(
         'w-full sticky top-0 z-50 bg-white transition-all px-24',
         sticky ? 'shadow' : '',
-        pathname.startsWith('/chat') && 'px-4'
+        isPaddingNormal && 'px-6'
       )}
     >
       {children}
