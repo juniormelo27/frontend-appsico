@@ -14,11 +14,12 @@ export default async function Listining() {
     data: Array<string>;
   }>(`/conversations/slots/${session.user.id}/`, {
     method: 'GET',
-    cache: 'no-cache',
     next: {
       tags: ['conversation.slots'],
     },
   });
+
+  console.log(slots)
 
   const conversations = await Promise.all(
     slots.data.map((item) =>
@@ -29,7 +30,6 @@ export default async function Listining() {
           next: {
             tags: [`conversation.slots.${item}`],
           },
-          cache: 'no-cache',
         }
       ).then((response) => ({
         ...response,

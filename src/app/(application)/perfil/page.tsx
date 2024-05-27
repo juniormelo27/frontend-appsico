@@ -499,7 +499,7 @@ export default function FormUpdateUser() {
                                             (e) =>
                                               !form
                                                 .watch('profile.specialties')
-                                                .includes(e.id)
+                                                ?.includes(e.id)
                                           )
                                           .map((item) => ({
                                             value: item.id,
@@ -623,7 +623,7 @@ export default function FormUpdateUser() {
                                             (e) =>
                                               !form
                                                 .watch('profile.approach')
-                                                .includes(e.id)
+                                                ?.includes(e.id)
                                           )
                                           .map((item) => ({
                                             value: item.id,
