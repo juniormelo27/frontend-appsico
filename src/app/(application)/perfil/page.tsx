@@ -444,7 +444,7 @@ export default function FormUpdateUser() {
                         <FormMessage />
                         <div />
                         <div className='text-xs'>
-                          <span>{values.profile.bio.length} / 1000</span>
+                          <span>{values.profile.bio?.length} / 1000</span>
                         </div>
                       </div>
                     </FormItem>
