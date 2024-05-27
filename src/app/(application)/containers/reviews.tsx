@@ -4,7 +4,7 @@ const data: Array<{
   title: string;
   content: string;
   image: string;
-}> = [  
+}> = [
   {
     image:
       'https://images.unsplash.com/photo-1595152772835-219674b2a8a6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
@@ -75,7 +75,8 @@ export default function Reviews() {
     <section className='bg-white my-10 mb-20 max-md:my-5 max-md:px-5'>
       <div className='mx-auto max-w-screen-xl py-12 sm:px-6 lg:px-8 lg:py-16'>
         <h2 className='text-center text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl'>
-          Depoimento de usuários
+          Depoimento de usuários{' '}
+          <sup className=' text-destructive text-sm'>( Futuro )</sup>
         </h2>
         <div className='mt-8 [column-fill:_balance] sm:columns-2 sm:gap-6 lg:columns-3 lg:gap-8'>
           {data.map((item, index) => (

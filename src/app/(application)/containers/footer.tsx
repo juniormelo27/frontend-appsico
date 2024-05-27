@@ -1,5 +1,6 @@
 'use client';
 
+import { LucideInstagram } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -9,58 +10,9 @@ const social: Array<{
   url: string;
 }> = [
   {
-    icon: (
-      <svg
-        className='h-6 w-6'
-        fill='currentColor'
-        viewBox='0 0 24 24'
-        aria-hidden='true'
-      >
-        <path
-          fillRule='evenodd'
-          d='M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z'
-          clipRule='evenodd'
-        />
-      </svg>
-    ),
-    title: 'Facebook',
-    url: '',
-  },
-  {
-    icon: (
-      <svg
-        className='h-6 w-6'
-        fill='currentColor'
-        viewBox='0 0 24 24'
-        aria-hidden='true'
-      >
-        <path
-          fillRule='evenodd'
-          d='M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z'
-          clipRule='evenodd'
-        />
-      </svg>
-    ),
+    icon: <LucideInstagram />,
     title: 'Instagram',
-    url: '',
-  },
-  {
-    icon: (
-      <svg
-        className='h-6 w-6'
-        fill='currentColor'
-        viewBox='0 0 24 24'
-        aria-hidden='true'
-      >
-        <path
-          fillRule='evenodd'
-          d='M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z'
-          clipRule='evenodd'
-        />
-      </svg>
-    ),
-    title: 'X',
-    url: '',
+    url: 'https://instagram.com/appsico_official',
   },
 ];
 
@@ -82,8 +34,9 @@ export default function Footer() {
               </h1>
             </div>
             <p className='mt-6 max-w-md text-center text-gray-500 text-sm leading-snug sm:max-w-xs sm:text-left'>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Incidunt
-              consequuntur amet culpa cum itaque neque.
+              A ponte digital para o bem-estar: simplificamos a conexão entre
+              psicólogos e pacientes, facilitando o acesso a tratamentos
+              psicológicos com transparência e confiança
             </p>
             <ul className='mt-8 flex justify-center gap-6 sm:justify-start md:gap-8'>
               {social.map((item, index) => (
@@ -217,12 +170,12 @@ export default function Footer() {
 
             <div className='text-center sm:text-left'>
               <p className='text-lg font-medium text-gray-900'>Contact Us</p>
-
               <ul className='mt-8 space-y-4 text-sm'>
                 <li>
-                  <a
+                  <Link
+                    target='_blank'
                     className='flex items-center justify-center gap-1.5 ltr:sm:justify-start rtl:sm:justify-end'
-                    href='#'
+                    href='mailto:appsico.contato@gmail.com'
                   >
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
@@ -239,14 +192,16 @@ export default function Footer() {
                       />
                     </svg>
 
-                    <span className='flex-1 text-gray-500'>john@doe.com</span>
-                  </a>
+                    <span className='flex-1 text-gray-500'>
+                      appsico.contato@gmail.com
+                    </span>
+                  </Link>
                 </li>
-
                 <li>
-                  <a
+                  <Link
+                    target='_blank'
                     className='flex items-center justify-center gap-1.5 ltr:sm:justify-start rtl:sm:justify-end'
-                    href='#'
+                    href='https://wa.me/5511948827601'
                   >
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
@@ -263,10 +218,11 @@ export default function Footer() {
                       />
                     </svg>
 
-                    <span className='flex-1 text-gray-500'>0123456789</span>
-                  </a>
+                    <span className='flex-1 text-gray-500'>
+                      +55 (11) 94882-7601
+                    </span>
+                  </Link>
                 </li>
-
                 <li className='flex items-start justify-center gap-1.5 ltr:sm:justify-start rtl:sm:justify-end'>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -289,7 +245,7 @@ export default function Footer() {
                   </svg>
 
                   <address className='-mt-0.5 flex-1 not-italic text-gray-500'>
-                    213 Lane, London, United Kingdom
+                    Rua Alegre 633, Santa Paula, São Caetano do Sul
                   </address>
                 </li>
               </ul>
