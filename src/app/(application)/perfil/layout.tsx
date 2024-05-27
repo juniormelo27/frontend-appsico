@@ -8,6 +8,7 @@ import ProviderProfile from './provider';
 
 export type ProfessionalResponse = {
   id: string;
+  type: 'patient' | 'professional';
   name: string;
   image?: string;
   profile: {

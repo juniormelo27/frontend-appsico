@@ -59,7 +59,7 @@ import {
   LucideX,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDebounceValue } from 'usehooks-ts';
 import { z } from 'zod';
@@ -86,13 +86,23 @@ export default function FormUpdateUser() {
     reValidateMode: 'onChange',
     resolver: zodResolver(SchemaProfileUpdate),
     defaultValues: {
+      type: data.type,
       email: data.email,
       phone: masked.phone(data.phone.slice(2)),
       profile: {
         bio: data.profile.bio,
-        specialties: data.profile.specialties.flatMap((item) => item.id),
-        approach: data.profile.approach.flatMap((item) => item.id),
-        service: data.profile.service.flatMap((item) => item),
+        specialties:
+          data.type === 'patient'
+            ? []
+            : data.profile.specialties.flatMap((item) => item.id),
+        approach:
+          data.type === 'patient'
+            ? []
+            : data.profile.approach.flatMap((item) => item.id),
+        service:
+          data.type === 'patient'
+            ? []
+            : data.profile.service.flatMap((item) => item),
       },
       address: !!data.address.street
         ? {
@@ -300,28 +310,30 @@ export default function FormUpdateUser() {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name='profile.service'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tipo de atendimento:</FormLabel>
-                          <FormControl>
-                            <MultiSelect
-                              {...field}
-                              defaultValue={field.value}
-                              placeholder='Tipo de atendimento'
-                              onValueChange={(value) => field.onChange(value)}
-                              options={services.data?.map((item) => ({
-                                value: item,
-                                label: item,
-                              }))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {data.type === 'professional' && (
+                      <FormField
+                        control={form.control}
+                        name='profile.service'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo de atendimento:</FormLabel>
+                            <FormControl>
+                              <MultiSelect
+                                {...field}
+                                defaultValue={field.value}
+                                placeholder='Tipo de atendimento'
+                                onValueChange={(value) => field.onChange(value)}
+                                options={services.data?.map((item) => ({
+                                  value: item,
+                                  label: item,
+                                }))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                     <FormField
                       control={form.control}
                       name='address.street'
@@ -433,250 +445,258 @@ export default function FormUpdateUser() {
                     </FormItem>
                   )}
                 />
-                <div>
-                  <div className='flex flex-row items-center justify-between mb-3'>
-                    <div className=' leading-none'>
-                      <span className='text-base font-semibold block'>
-                        Especialidades:
-                      </span>
-                      {!values.profile.specialties.length && (
-                        <p className='block text-xs font-medium text-destructive'>
-                          Minímo 1 especialidade
-                        </p>
-                      )}
-                    </div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button type='button' size='sm' variant='outline'>
-                          Adicionar <LucidePlus className='w-4 h-4 ml-2' />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            Adicionar novas especialidades
-                          </DialogTitle>
-                          <DialogDescription>
-                            Informe as novas especialidades que você atual
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Form {...formInsertSpecialties}>
-                          <FormField
-                            control={formInsertSpecialties.control}
-                            name='id'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <MultiSelect
-                                    {...field}
-                                    defaultValue={field.value}
-                                    placeholder='Novas especialidades'
-                                    onValueChange={(value) =>
-                                      field.onChange(value || [])
-                                    }
-                                    options={specialties.data
-                                      ?.filter(
-                                        (e) =>
-                                          !form
-                                            .watch('profile.specialties')
-                                            .includes(e.id)
-                                      )
-                                      .map((item) => ({
-                                        value: item.id,
-                                        label: item.name,
-                                      }))}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                        </Form>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button
-                              type='button'
-                              variant='destructive'
-                              className='uppercase'
-                            >
-                              fechar
+                {data.type === 'professional' && (
+                  <Fragment>
+                    <div>
+                      <div className='flex flex-row items-center justify-between mb-3'>
+                        <div className=' leading-none'>
+                          <span className='text-base font-semibold block'>
+                            Especialidades:
+                          </span>
+                          {!values.profile.specialties.length && (
+                            <p className='block text-xs font-medium text-destructive'>
+                              Minímo 1 especialidade
+                            </p>
+                          )}
+                        </div>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button type='button' size='sm' variant='outline'>
+                              Adicionar <LucidePlus className='w-4 h-4 ml-2' />
                             </Button>
-                          </DialogClose>
-                          <DialogClose asChild>
-                            <Button
-                              type='button'
-                              className='uppercase'
-                              disabled={
-                                !SchemaInsertSpecialties.safeParse(
-                                  formInsertSpecialties.watch()
-                                ).success
-                              }
-                              onClick={() => {
-                                form.setValue('profile.specialties', [
-                                  ...formInsertSpecialties.getValues('id'),
-                                  ...form.getValues('profile.specialties'),
-                                ]);
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Adicionar novas especialidades
+                              </DialogTitle>
+                              <DialogDescription>
+                                Informe as novas especialidades que você atual
+                              </DialogDescription>
+                            </DialogHeader>
+                            <Form {...formInsertSpecialties}>
+                              <FormField
+                                control={formInsertSpecialties.control}
+                                name='id'
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <MultiSelect
+                                        {...field}
+                                        defaultValue={field.value}
+                                        placeholder='Novas especialidades'
+                                        onValueChange={(value) =>
+                                          field.onChange(value || [])
+                                        }
+                                        options={specialties.data
+                                          ?.filter(
+                                            (e) =>
+                                              !form
+                                                .watch('profile.specialties')
+                                                .includes(e.id)
+                                          )
+                                          .map((item) => ({
+                                            value: item.id,
+                                            label: item.name,
+                                          }))}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            </Form>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button
+                                  type='button'
+                                  variant='destructive'
+                                  className='uppercase'
+                                >
+                                  fechar
+                                </Button>
+                              </DialogClose>
+                              <DialogClose asChild>
+                                <Button
+                                  type='button'
+                                  className='uppercase'
+                                  disabled={
+                                    !SchemaInsertSpecialties.safeParse(
+                                      formInsertSpecialties.watch()
+                                    ).success
+                                  }
+                                  onClick={() => {
+                                    form.setValue('profile.specialties', [
+                                      ...formInsertSpecialties.getValues('id'),
+                                      ...form.getValues('profile.specialties'),
+                                    ]);
 
-                                formInsertSpecialties.reset();
-                              }}
-                            >
-                              adicionar <LucidePlus className='w-4 h-4 ml-2' />
-                            </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                  <div className='space-y-3'>
-                    {!values.profile.specialties.length && (
-                      <Badge>Nenhuma especialidade</Badge>
-                    )}
-                    {values.profile.specialties.map((item) => (
-                      <div
-                        key={item}
-                        className='rounded-md border px-4 py-2 font-mono text-sm capitalize relative flex flex-row items-center justify-between'
-                      >
-                        {specialties.data?.find((e) => e.id === item)?.name}
-                        <Button
-                          type='button'
-                          size='icon'
-                          variant='outline'
-                          className='w-6 h-6'
-                          onClick={() =>
-                            form.setValue(
-                              'profile.specialties',
-                              form
-                                .getValues('profile.specialties')
-                                .filter((e) => e !== item)
-                            )
-                          }
-                        >
-                          <LucideX className='w-4 h-4' />
-                        </Button>
+                                    formInsertSpecialties.reset();
+                                  }}
+                                >
+                                  adicionar{' '}
+                                  <LucidePlus className='w-4 h-4 ml-2' />
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className='flex flex-row items-center justify-between mb-3'>
-                    <div className=' leading-none'>
-                      <span className='text-base font-semibold block'>
-                        Abordagem:
-                      </span>
-                      {!values.profile.approach.length && (
-                        <p className='block text-xs font-medium text-destructive'>
-                          Minímo 1 abordagem
-                        </p>
-                      )}
-                    </div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button type='button' size='sm' variant='outline'>
-                          Adicionar <LucidePlus className='w-4 h-4 ml-2' />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Adicionar novas abordagens</DialogTitle>
-                          <DialogDescription>
-                            Informe as novas abordagens que você atual
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Form {...formInsertApproach}>
-                          <FormField
-                            control={formInsertApproach.control}
-                            name='id'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <MultiSelect
-                                    {...field}
-                                    defaultValue={field.value}
-                                    placeholder='Novas abordagens'
-                                    onValueChange={(value) =>
-                                      field.onChange(value || [])
-                                    }
-                                    options={approach.data
-                                      ?.filter(
-                                        (e) =>
-                                          !form
-                                            .watch('profile.approach')
-                                            .includes(e.id)
-                                      )
-                                      .map((item) => ({
-                                        value: item.id,
-                                        label: item.name,
-                                      }))}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                        </Form>
-                        <DialogFooter>
-                          <DialogClose asChild>
+                      <div className='space-y-3'>
+                        {!values.profile.specialties.length && (
+                          <Badge>Nenhuma especialidade</Badge>
+                        )}
+                        {values.profile.specialties.map((item) => (
+                          <div
+                            key={item}
+                            className='rounded-md border px-4 py-2 font-mono text-sm capitalize relative flex flex-row items-center justify-between'
+                          >
+                            {specialties.data?.find((e) => e.id === item)?.name}
                             <Button
                               type='button'
-                              variant='destructive'
-                              className='uppercase'
-                            >
-                              fechar
-                            </Button>
-                          </DialogClose>
-                          <DialogClose asChild>
-                            <Button
-                              type='button'
-                              className='uppercase'
-                              disabled={
-                                !SchemaInsertApproach.safeParse(
-                                  formInsertApproach.watch()
-                                ).success
+                              size='icon'
+                              variant='outline'
+                              className='w-6 h-6'
+                              onClick={() =>
+                                form.setValue(
+                                  'profile.specialties',
+                                  form
+                                    .getValues('profile.specialties')
+                                    .filter((e) => e !== item)
+                                )
                               }
-                              onClick={() => {
-                                form.setValue('profile.approach', [
-                                  ...formInsertApproach.getValues('id'),
-                                  ...form.getValues('profile.approach'),
-                                ]);
-
-                                formInsertApproach.reset();
-                              }}
                             >
-                              adicionar <LucidePlus className='w-4 h-4 ml-2' />
+                              <LucideX className='w-4 h-4' />
                             </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                  <div className='space-y-3'>
-                    {!values.profile.approach.length && (
-                      <Badge>Nenhuma abordagem</Badge>
-                    )}
-                    {values.profile.approach.map((item) => (
-                      <div
-                        key={item}
-                        className='rounded-md border px-4 py-2 font-mono text-sm capitalize relative flex flex-row items-center justify-between'
-                      >
-                        {approach.data?.find((e) => e.id === item)?.name}
-                        <Button
-                          type='button'
-                          size='icon'
-                          variant='outline'
-                          className='w-6 h-6'
-                          onClick={() =>
-                            form.setValue(
-                              'profile.approach',
-                              form
-                                .getValues('profile.approach')
-                                .filter((e) => e !== item)
-                            )
-                          }
-                        >
-                          <LucideX className='w-4 h-4' />
-                        </Button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    </div>
+                    <div>
+                      <div className='flex flex-row items-center justify-between mb-3'>
+                        <div className=' leading-none'>
+                          <span className='text-base font-semibold block'>
+                            Abordagem:
+                          </span>
+                          {!values.profile.approach.length && (
+                            <p className='block text-xs font-medium text-destructive'>
+                              Minímo 1 abordagem
+                            </p>
+                          )}
+                        </div>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button type='button' size='sm' variant='outline'>
+                              Adicionar <LucidePlus className='w-4 h-4 ml-2' />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Adicionar novas abordagens
+                              </DialogTitle>
+                              <DialogDescription>
+                                Informe as novas abordagens que você atual
+                              </DialogDescription>
+                            </DialogHeader>
+                            <Form {...formInsertApproach}>
+                              <FormField
+                                control={formInsertApproach.control}
+                                name='id'
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <MultiSelect
+                                        {...field}
+                                        defaultValue={field.value}
+                                        placeholder='Novas abordagens'
+                                        onValueChange={(value) =>
+                                          field.onChange(value || [])
+                                        }
+                                        options={approach.data
+                                          ?.filter(
+                                            (e) =>
+                                              !form
+                                                .watch('profile.approach')
+                                                .includes(e.id)
+                                          )
+                                          .map((item) => ({
+                                            value: item.id,
+                                            label: item.name,
+                                          }))}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            </Form>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button
+                                  type='button'
+                                  variant='destructive'
+                                  className='uppercase'
+                                >
+                                  fechar
+                                </Button>
+                              </DialogClose>
+                              <DialogClose asChild>
+                                <Button
+                                  type='button'
+                                  className='uppercase'
+                                  disabled={
+                                    !SchemaInsertApproach.safeParse(
+                                      formInsertApproach.watch()
+                                    ).success
+                                  }
+                                  onClick={() => {
+                                    form.setValue('profile.approach', [
+                                      ...formInsertApproach.getValues('id'),
+                                      ...form.getValues('profile.approach'),
+                                    ]);
+
+                                    formInsertApproach.reset();
+                                  }}
+                                >
+                                  adicionar{' '}
+                                  <LucidePlus className='w-4 h-4 ml-2' />
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                      <div className='space-y-3'>
+                        {!values.profile.approach.length && (
+                          <Badge>Nenhuma abordagem</Badge>
+                        )}
+                        {values.profile.approach.map((item) => (
+                          <div
+                            key={item}
+                            className='rounded-md border px-4 py-2 font-mono text-sm capitalize relative flex flex-row items-center justify-between'
+                          >
+                            {approach.data?.find((e) => e.id === item)?.name}
+                            <Button
+                              type='button'
+                              size='icon'
+                              variant='outline'
+                              className='w-6 h-6'
+                              onClick={() =>
+                                form.setValue(
+                                  'profile.approach',
+                                  form
+                                    .getValues('profile.approach')
+                                    .filter((e) => e !== item)
+                                )
+                              }
+                            >
+                              <LucideX className='w-4 h-4' />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Fragment>
+                )}
                 <Button
                   type='submit'
                   className='w-full'
@@ -760,7 +780,9 @@ function ModalUpdatePassword({
           dismiss(toastIds.error);
           return toast({
             itemID: toastIds.error,
-            title: (error.message || 'FALHA AO ATUALIZAR A SENHA').toUpperCase(),
+            title: (
+              error.message || 'FALHA AO ATUALIZAR A SENHA'
+            ).toUpperCase(),
             description: 'Tente novamente.',
             variant: 'destructive',
           });
