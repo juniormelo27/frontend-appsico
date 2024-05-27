@@ -64,7 +64,6 @@ export default async function ProfessionalDetailsScreen({
       `/professionals/${id}/social/verify/?user=${session?.user.id!}`,
       {
         method: 'GET',
-        cache: 'no-cache',
       }
     ),
   ]);
@@ -74,7 +73,7 @@ export default async function ProfessionalDetailsScreen({
   }
   return (
     <main>
-      <section className='relative '>
+      <section className='relative'>
         <div className='relative flex flex-col min-w-0 break-words border bg-white w-full border-b-0 rounded-lg'>
           <div className='px-6 grid grid-cols-[35vw_auto] max-md:grid-cols-1'>
             <div className='flex-1 w-full border-r max-md:border-r-0 max-md:border-b py-10'>

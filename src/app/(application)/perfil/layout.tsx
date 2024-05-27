@@ -57,15 +57,9 @@ export default async function ProfessionalDetailsScreen({
     return redirect('/');
   }
 
-  const data = await http<ProfessionalResponse>(
-    `/professionals/${session.user.id}`,
-    {
-      method: 'GET',
-      next: {
-        revalidate: 300,
-      },
-    }
-  );
+  const data = await http<ProfessionalResponse>(`/users/${session.user.id}`, {
+    method: 'GET',
+  });
 
   if (!data) {
     redirect('/profissionais');
