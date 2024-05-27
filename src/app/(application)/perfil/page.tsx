@@ -94,15 +94,15 @@ export default function FormUpdateUser() {
         specialties:
           data.type === 'patient'
             ? []
-            : data.profile.specialties.flatMap((item) => item.id),
+            : data.profile.specialties?.flatMap((item) => item.id),
         approach:
           data.type === 'patient'
             ? []
-            : data.profile.approach.flatMap((item) => item.id),
+            : data.profile.approach?.flatMap((item) => item.id),
         service:
           data.type === 'patient'
             ? []
-            : data.profile.service.flatMap((item) => item),
+            : data.profile.service?.flatMap((item) => item),
       },
       address: !!data.address.street
         ? {
@@ -459,7 +459,7 @@ export default function FormUpdateUser() {
                           <span className='text-base font-semibold block'>
                             Especialidades:
                           </span>
-                          {!values.profile.specialties.length && (
+                          {!values.profile.specialties?.length && (
                             <p className='block text-xs font-medium text-destructive'>
                               Minímo 1 especialidade
                             </p>
@@ -548,10 +548,10 @@ export default function FormUpdateUser() {
                         </Dialog>
                       </div>
                       <div className='space-y-3'>
-                        {!values.profile.specialties.length && (
+                        {!values.profile.specialties?.length && (
                           <Badge>Nenhuma especialidade</Badge>
                         )}
-                        {values.profile.specialties.map((item) => (
+                        {values.profile.specialties?.map((item) => (
                           <div
                             key={item}
                             className='rounded-md border px-4 py-2 font-mono text-sm capitalize relative flex flex-row items-center justify-between'
@@ -583,7 +583,7 @@ export default function FormUpdateUser() {
                           <span className='text-base font-semibold block'>
                             Abordagem:
                           </span>
-                          {!values.profile.approach.length && (
+                          {!values.profile.approach?.length && (
                             <p className='block text-xs font-medium text-destructive'>
                               Minímo 1 abordagem
                             </p>
@@ -672,10 +672,10 @@ export default function FormUpdateUser() {
                         </Dialog>
                       </div>
                       <div className='space-y-3'>
-                        {!values.profile.approach.length && (
+                        {!values.profile.approach?.length && (
                           <Badge>Nenhuma abordagem</Badge>
                         )}
-                        {values.profile.approach.map((item) => (
+                        {values.profile.approach?.map((item) => (
                           <div
                             key={item}
                             className='rounded-md border px-4 py-2 font-mono text-sm capitalize relative flex flex-row items-center justify-between'
