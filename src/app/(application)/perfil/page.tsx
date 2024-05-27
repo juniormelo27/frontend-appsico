@@ -344,11 +344,12 @@ export default function FormUpdateUser() {
                       name='address.street'
                       render={({ field }) => (
                         <FormItem className='relative'>
-                          <span className='absolute text-xs text-[0.49rem] -top-1 right-0'>
-                            Informe o número do endereço
-                          </span>
-                          <FormLabel>Endereço:</FormLabel>
-
+                          <div className='flex flex-col'>
+                            <FormLabel>Endereço:</FormLabel>
+                            <span className='text-xs text-[0.49rem] -top-1 right-0'>
+                              Informe o número do endereço
+                            </span>
+                          </div>
                           <div className='flex flex-row items-center justify-between gap-2 relative'>
                             <FormControl>
                               <Input
