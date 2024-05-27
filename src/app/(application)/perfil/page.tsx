@@ -325,7 +325,12 @@ export default function FormUpdateUser() {
                                 onValueChange={(value) => field.onChange(value)}
                                 options={services.data?.map((item) => ({
                                   value: item,
-                                  label: item,
+                                  label:
+                                    item === 'social'
+                                      ? 'Social'
+                                      : item === 'covenant'
+                                      ? 'Convênio'
+                                      : 'Particular',
                                 }))}
                               />
                             </FormControl>
