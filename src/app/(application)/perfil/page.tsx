@@ -706,7 +706,7 @@ export default function FormUpdateUser() {
                   type='submit'
                   className='w-full'
                   isLoading={isPending}
-                  textloading='alterando'
+                  textloading='ALTERANDO'
                   disabled={isPending || !validate}
                 >
                   Atualizar informações
@@ -883,7 +883,7 @@ function ModalUpdatePassword({
             disabled={!validate}
             className='uppercase'
             isLoading={isPending}
-            textloading='alterando'
+            textloading='ALTERANDO'
           >
             alterar senha <LucideKey className='w-4 h-4 ml-2' />
           </Button>
