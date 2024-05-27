@@ -533,7 +533,9 @@ export default function FormUpdateUser() {
                                   onClick={() => {
                                     form.setValue('profile.specialties', [
                                       ...formInsertSpecialties.getValues('id'),
-                                      ...form.getValues('profile.specialties'),
+                                      ...(form.getValues(
+                                        'profile.specialties'
+                                      ) || []),
                                     ]);
 
                                     formInsertSpecialties.reset();
@@ -657,7 +659,8 @@ export default function FormUpdateUser() {
                                   onClick={() => {
                                     form.setValue('profile.approach', [
                                       ...formInsertApproach.getValues('id'),
-                                      ...form.getValues('profile.approach'),
+                                      ...(form.getValues('profile.approach') ||
+                                        []),
                                     ]);
 
                                     formInsertApproach.reset();
