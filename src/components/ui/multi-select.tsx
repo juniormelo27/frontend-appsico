@@ -1,14 +1,9 @@
-import { cva, type VariantProps } from "class-variance-authority";
-import {
-  ChevronDown,
-  WandSparkles,
-  XCircle,
-  XIcon
-} from "lucide-react";
-import * as React from "react";
+import { cva, type VariantProps } from 'class-variance-authority';
+import { ChevronDown, WandSparkles, XCircle, XIcon } from 'lucide-react';
+import * as React from 'react';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -17,14 +12,14 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/libraries/utils";
+} from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/libraries/utils';
 import { Checkbox } from './checkbox';
 
 const multiSelectVariants = cva('m-1', {
@@ -114,7 +109,11 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
     };
 
     return (
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+      <Popover
+        open={isPopoverOpen}
+        onOpenChange={setIsPopoverOpen}
+        modal={true}
+      >
         <PopoverTrigger asChild>
           <Button
             ref={ref}
@@ -189,10 +188,10 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
         >
           <Command>
             <CommandInput
-              placeholder='Search...'
+              placeholder='Pesquisar...'
               onKeyDown={handleInputKeyDown}
             />
-            <CommandList>
+            <CommandList className='max-h-60'>
               <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
               <CommandGroup>
                 {options?.map((option) => {
@@ -218,45 +217,45 @@ const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
                   );
                 })}
               </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup>
-                <div className='flex items-center justify-between'>
-                  {selectedValues.length > 0 && (
-                    <>
-                      <CommandItem
-                        onSelect={() => {
-                          setSelectedValues([]);
-                          selectedValuesSet.current.clear();
-                          onValueChange([]);
-                        }}
-                        style={{
-                          pointerEvents: 'auto',
-                          opacity: 1,
-                        }}
-                        className='flex-1 justify-center cursor-pointer'
-                      >
-                        Clear
-                      </CommandItem>
-                      <Separator
-                        orientation='vertical'
-                        className='flex min-h-6 h-full'
-                      />
-                    </>
-                  )}
-                  <CommandSeparator />
-                  <CommandItem
-                    onSelect={() => setIsPopoverOpen(false)}
-                    style={{
-                      pointerEvents: 'auto',
-                      opacity: 1,
-                    }}
-                    className='flex-1 justify-center cursor-pointer'
-                  >
-                    Close
-                  </CommandItem>
-                </div>
-              </CommandGroup>
             </CommandList>
+            <CommandSeparator />
+            <CommandGroup>
+              <div className='flex items-center justify-between'>
+                {selectedValues.length > 0 && (
+                  <>
+                    <CommandItem
+                      onSelect={() => {
+                        setSelectedValues([]);
+                        selectedValuesSet.current.clear();
+                        onValueChange([]);
+                      }}
+                      style={{
+                        pointerEvents: 'auto',
+                        opacity: 1,
+                      }}
+                      className='flex-1 justify-center cursor-pointer'
+                    >
+                      Limpar
+                    </CommandItem>
+                    <Separator
+                      orientation='vertical'
+                      className='flex min-h-6 h-full'
+                    />
+                  </>
+                )}
+                <CommandSeparator />
+                <CommandItem
+                  onSelect={() => setIsPopoverOpen(false)}
+                  style={{
+                    pointerEvents: 'auto',
+                    opacity: 1,
+                  }}
+                  className='flex-1 justify-center cursor-pointer'
+                >
+                  Fechar
+                </CommandItem>
+              </div>
+            </CommandGroup>
           </Command>
         </PopoverContent>
         {animation > 0 && selectedValues.length > 0 && (

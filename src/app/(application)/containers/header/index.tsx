@@ -130,7 +130,9 @@ function PopoverProfile({
 }>) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild className='cursor-pointer'>
+        {children}
+      </DropdownMenuTrigger>
       <DropdownMenuContent sideOffset={8} className='w-56'>
         <DropdownMenuGroup>
           <Link href='/profissional'>
@@ -156,7 +158,7 @@ function PopoverProfile({
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <Link href='https://wa.me/5511948827601'>
+        <Link target='_blank' href='https://wa.me/5511948827601'>
           <DropdownMenuItem>
             <LucideLifeBuoy className='mr-2 h-4 w-4' />
             <span>Suporte</span>

@@ -77,3 +77,18 @@ export const SchemaRegisterProfession = z
     message: 'CRP incompleto',
   })
   .transform((value) => masked.number(value));
+
+export const SchemaAddress = z.object({
+  display_name: z.string().min(1),
+  street: z.string().min(1, 'Mínimo 1 caractere'),
+  number: z.coerce.number().min(1),
+  neighborhood: z.string().min(1),
+  city: z.string().min(1),
+  state: z.string().min(1),
+  state_code: z.string().min(1),
+  country: z.string().min(1),
+  country_code: z.string().min(1),
+  zip_code: z.string().min(1),
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
+});

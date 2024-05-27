@@ -1,8 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import Link from 'next/link';
 import Filter from './containers/filter';
 
 import {
@@ -15,30 +13,38 @@ import {
 import { Separator } from '@/components/ui/separator';
 import {
   RequestFindManyProfessionals,
+  ResponseFindManyProfessionals,
   useProfessionals,
 } from '@/libraries/hooks/useProfessional';
 import masked from '@/libraries/masked';
 import { cn, transformSearchParamsToArray } from '@/libraries/utils';
 import PLACEHOLDER from '@/public/images/placeholder.jpeg';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { memo } from 'react';
 import Pagination, { TabGrid } from './containers/pagination';
 
 const LIMIT = 24;
 
+type RequestFindMany = RequestFindManyProfessionals & {
+  viewed?: 'grid' | 'list';
+  state?: string;
+  city?: string;
+};
+
 export default function ProfessionalScreen(props: {
-  searchParams: RequestFindManyProfessionals & {
-    viewed?: 'grid' | 'list';
-    state?: string;
-    city?: string;
-  };
+  searchParams: RequestFindMany;
 }) {
   const session = useSession();
 
   const { data, isPending, error, refetch } = useProfessionals(
     {
-      ...props.searchParams,
-      //@ts-expect-error
-      viewed: undefined,
+      cursor: props.searchParams.cursor,
+      search: props.searchParams.search,
+      specialties: transformSearchParamsToArray(props.searchParams.specialties),
+      approach: transformSearchParamsToArray(props.searchParams.approach),
+      services: transformSearchParamsToArray(props.searchParams.services),
       address:
         props.searchParams.state || props.searchParams.city
           ? {
@@ -46,9 +52,6 @@ export default function ProfessionalScreen(props: {
               city: props.searchParams.city,
             }
           : undefined,
-      specialties: transformSearchParamsToArray(props.searchParams.specialties),
-      approach: transformSearchParamsToArray(props.searchParams.approach),
-      services: transformSearchParamsToArray(props.searchParams.services),
       removes: transformSearchParamsToArray(session.data?.user.id),
       limit: LIMIT,
       validated: true,
@@ -122,64 +125,11 @@ export default function ProfessionalScreen(props: {
             </Card>
           ) : (
             data.data.map((item) => (
-              <div
+              <Item
                 key={item.id}
-                className='bg-white rounded-lg h-full border overflow-hidden dark:bg-gray-950'
-              >
-                <div
-                  className={cn(
-                    'relative group overflow-hidden',
-                    props.searchParams.viewed === 'list' &&
-                      'grid grid-cols-[30vw_auto]'
-                  )}
-                >
-                  <Link
-                    className='absolute inset-0 z-10'
-                    href={`/profissional/${item.id}`}
-                  >
-                    <span className='sr-only'>Ver perfil</span>
-                  </Link>
-                  <Image
-                    alt={item.name}
-                    className={cn(
-                      'object-cover w-full h-48 aspect-[400/300]',
-                      props.searchParams.viewed === 'list' && 'h-full'
-                    )}
-                    src={item.image || PLACEHOLDER}
-                    width={400}
-                    height={300}
-                    placeholder='blur'
-                    blurDataURL={PLACEHOLDER.blurDataURL}
-                  />
-                  <div className='p-4 flex flex-col h-full justify-between'>
-                    <div className='flex-1'>
-                      <h3 className='text-base font-semibold truncate'>
-                        {masked.name(item.name)}
-                      </h3>
-                      {!!item.profile?.approach.length && (
-                        <p className='text-gray-500 text-sm truncate'>
-                          {item.profile?.approach
-                            .flatMap((item) => item.name)
-                            .slice(0, 3)
-                            .join(', ')}
-                        </p>
-                      )}
-                      <Separator className='my-3' />
-                      {item.profile?.bio && (
-                        <p className='text-gray-500 text-sm font-normal'>
-                          {item.profile?.bio.slice(
-                            0,
-                            props.searchParams.viewed === 'list' ? 400 : 40
-                          ) + '...'}
-                        </p>
-                      )}
-                    </div>
-                    <Button className='mt-4 w-full' size='sm'>
-                      Ver mais
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                data={item}
+                viewed={props.searchParams.viewed || 'grid'}
+              />
             ))
           )}
           <div className='col-span-full flex items-center justify-center mx-auto'>
@@ -190,3 +140,66 @@ export default function ProfessionalScreen(props: {
     </main>
   );
 }
+
+const Item = memo(function ItemComponent({
+  data: item,
+  viewed,
+}: {
+  data: ResponseFindManyProfessionals['data'][0];
+  viewed: 'list' | 'grid';
+}) {
+  return (
+    <div className='bg-white rounded-lg h-full border overflow-hidden dark:bg-gray-950'>
+      <div
+        className={cn(
+          'relative group overflow-hidden',
+          viewed === 'list' && 'grid grid-cols-[30vw_auto]'
+        )}
+      >
+        <Link
+          className='absolute inset-0 z-10'
+          href={`/profissional/${item.id}`}
+        >
+          <span className='sr-only'>Ver perfil</span>
+        </Link>
+        <Image
+          alt={item.name}
+          className={cn(
+            'object-cover w-full h-48 aspect-[400/300]',
+            viewed === 'list' && 'h-full'
+          )}
+          src={item.image || PLACEHOLDER}
+          width={400}
+          height={300}
+          placeholder='blur'
+          blurDataURL={PLACEHOLDER.blurDataURL}
+        />
+        <div className='p-4 flex flex-col h-full justify-between'>
+          <div className='flex-1'>
+            <h3 className='text-base font-semibold truncate'>
+              {masked.name(item.name)}
+            </h3>
+            {!!item.profile?.approach.length && (
+              <p className='text-gray-500 text-sm truncate'>
+                {item.profile?.approach
+                  .flatMap((item) => item.name)
+                  .slice(0, 3)
+                  .join(', ')}
+              </p>
+            )}
+            <Separator className='my-3' />
+            {item.profile?.bio && (
+              <p className='text-gray-500 text-sm font-normal'>
+                {item.profile?.bio.slice(0, viewed === 'list' ? 400 : 40) +
+                  '...'}
+              </p>
+            )}
+          </div>
+          <Button className='mt-4 w-full' size='sm'>
+            Ver mais
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+});

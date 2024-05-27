@@ -17,7 +17,7 @@ export type RequestFindManyProfessionals = {
   removes?: Array<string>;
 };
 
-type ResponseFindManyProfessionals = {
+export type ResponseFindManyProfessionals = {
   next?: string;
   previous?: string;
   data: Array<{

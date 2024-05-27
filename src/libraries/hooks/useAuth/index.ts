@@ -1,4 +1,5 @@
 import { ForgotPassword, Login, Register } from '@/@types';
+import { TypeProfileUpdate } from '@/@types/schema/auth/profile';
 import http from '@/services/fetch';
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from 'next-auth/react';
@@ -70,5 +71,55 @@ export const useAuthForgot = () =>
       });
 
       return response;
+    },
+  });
+
+export const useAuthUpdateProfile = (session: string) =>
+  useMutation<
+    {
+      message: string;
+    },
+    Error,
+    TypeProfileUpdate
+  >({
+    mutationFn: async (props) => {
+      await http<{
+        message: string;
+      }>('/auth/profile/' + session, {
+        method: 'PATCH',
+        body: JSON.stringify(props),
+      });
+
+      return {
+        message: 'alterado com sucesso',
+      };
+    },
+  });
+
+export const useAuthUpdatePassword = (session: string) =>
+  useMutation<
+    {
+      message: string;
+    },
+    Error,
+    {
+      password: string;
+      newPassword: string;
+    }
+  >({
+    mutationFn: async ({ password, newPassword }) => {
+      await http<{
+        message: string;
+      }>('/auth/password/' + session, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          current: password,
+          password: newPassword,
+        }),
+      });
+
+      return {
+        message: 'alterado com sucesso',
+      };
     },
   });
