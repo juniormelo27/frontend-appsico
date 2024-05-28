@@ -19,8 +19,6 @@ export default async function Listining() {
     },
   });
 
-  console.log(slots)
-
   const conversations = await Promise.all(
     slots.data.map((item) =>
       http<ResponseConversation>(
